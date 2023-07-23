@@ -25,7 +25,7 @@ sealed class Screens(
         R.drawable.ic_person_pin
     )
 
-    object Main : Screens("Main-Screen")
+    object MapDisasterSearch : Screens("MapDisasterSearch-Screen")
     object Detail : Screens("Detail-Screen")
     object Profile : Screens(
         "Profile-Screen",

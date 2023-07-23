@@ -1,6 +1,8 @@
 package com.example.finalprojectgg.ui.navigation
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -11,9 +13,12 @@ import com.example.finalprojectgg.ui.screens.MapDisasterScreen
 import com.example.finalprojectgg.ui.screens.ProfileScreen
 import com.example.finalprojectgg.ui.screens.SearchDisasterScreen
 import com.example.finalprojectgg.ui.screens.SplashScreen
+import com.example.finalprojectgg.ui.view_model.MainViewModel
 
 @Composable
 fun AppNavGraph(
+    paddingValues: PaddingValues,
+    viewModel: MainViewModel,
     navController: NavHostController
 ) {
     NavHost(navController = navController, startDestination = Screens.Splash.route) {
@@ -21,22 +26,26 @@ fun AppNavGraph(
         composable(
             route = Screens.Splash.route
         ) {
-            SplashScreen(navToMainScreen = {
+            SplashScreen {
                 navController.navigate(Screens.ROOT_ROUTE)
-            })
+            }
+
         }
 
         navigation(
             startDestination = Screens.MapDisaster.route,
             route = Screens.ROOT_ROUTE
         ) {
+
             composable(
                 route = Screens.MapDisaster.route
             ) {
-                MapDisasterScreen()
+                MapDisasterScreen(paddingValues, viewModel) {
+                    navController.navigate(Screens.MapDisasterSearch.route)
+                }
             }
             composable(
-                route = Screens.SearchDisaster.route
+                route = Screens.MapDisasterSearch.route
             ) {
                 SearchDisasterScreen()
             }

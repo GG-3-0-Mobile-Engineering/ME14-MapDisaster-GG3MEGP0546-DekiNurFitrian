@@ -1,32 +1,24 @@
 package com.example.finalprojectgg.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.material.BottomSheetScaffold
-import androidx.compose.material.BottomSheetState
-import androidx.compose.material.BottomSheetValue
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Build
-import androidx.compose.material.icons.filled.Done
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.rememberBottomSheetScaffoldState
-import androidx.compose.material.rememberBottomSheetState
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material.rememberSwipeableState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.*
@@ -34,81 +26,91 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.CornerRadius
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.finalprojectgg.domain.model.ChipModel
+import com.example.finalprojectgg.ui.components.DisasterItem
 import com.example.finalprojectgg.ui.components.FilterChipGroup
-import com.example.finalprojectgg.ui.navigation.Screens
-@Preview(showBackground = true)
+import com.example.finalprojectgg.ui.components.FullHeightBottomSheet
+import com.example.finalprojectgg.ui.components.States
+import com.example.finalprojectgg.ui.view_model.MainViewModel
+
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun MapDisasterScreen() {
-    val bottomSheetState = rememberBottomSheetScaffoldState(
-        bottomSheetState = BottomSheetState(BottomSheetValue.Collapsed)
-    )
-    BottomSheetScaffold(
-        scaffoldState = bottomSheetState,
-        sheetContent = {
-            MapDisasterBottomSheet()
-        },
-        sheetShape = MaterialTheme.shapes.medium
+fun MapDisasterScreen(
+    paddingValues: PaddingValues,
+    viewModel: MainViewModel,
+    navToMapDisasterSearchScreen: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.primary)
     ) {
         Box(
-            modifier = Modifier
+            Modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.primary), contentAlignment = Alignment.Center
+                .padding(top = paddingValues.calculateTopPadding())
         ) {
-            Column(modifier = Modifier
-                .fillMaxWidth()
-                .align(Alignment.TopCenter)) {
-                MapDisasterSearch(
-                    modifier = Modifier
-                        .padding(10.dp)
-                )
-                MapdisasterFilterChip()
+            val swipeableState = rememberSwipeableState(initialValue = States.PEEK)
+
+            viewModel.updateMapBottomSheetState(swipeableState)
+
+            MapDisasterFilterChip()
+            FullHeightBottomSheet(
+                swipeableState = swipeableState,
+            ) {
+                items(10) {
+                    if (it == 0) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(MaterialTheme.shapes.small)
+                                .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f))
+                                .padding(top = 0.dp, start = 24.dp, end = 24.dp, bottom = 24.dp)
+                        ) {
+                            Column(
+                                Modifier
+                                    .fillMaxWidth()
+                                    .height(50.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.SpaceEvenly
+                            ) {
+                                Spacer(
+                                    modifier = Modifier
+                                        .height(4.dp)
+                                        .width(24.dp)
+                                        .clip(ShapeDefaults.ExtraLarge)
+                                        .background(MaterialTheme.colorScheme.outline)
+                                )
+                                Text(
+                                    text = "Info Bencana Terkini",
+                                    style = MaterialTheme.typography.titleLarge,
+                                    textAlign = TextAlign.Start,
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(16.dp))
+                            DisasterItem()
+                        }
+                    } else {
+                        DisasterItem(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(MaterialTheme.shapes.small)
+                                .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f))
+                                .padding(24.dp),
+                        )
+                    }
+                }
             }
-            Text(text = "INI ADALAH MAP", color = MaterialTheme.colorScheme.surface)
         }
     }
 }
 
-@Composable
-fun MapDisasterBottomSheet() {
-    Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
-        Spacer(modifier = Modifier.height(8.dp))
-        Box(modifier = Modifier
-            .height(5.dp)
-            .width(20.dp)
-            .clip(MaterialTheme.shapes.extraLarge)
-            .background(MaterialTheme.colorScheme.outline))
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun MapDisasterSearch(modifier: Modifier = Modifier) {
-    Row(
-        modifier
-            .fillMaxWidth()
-            .clip(ShapeDefaults.ExtraLarge)
-            .background(Color.Transparent)
-    ) {
-        TextField(
-            value = "text",
-            onValueChange = { },
-            label = { Text("Search") },
-            leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null) },
-            modifier = Modifier.fillMaxWidth()
-        )
-    }
-}
 
 @Composable
-fun MapdisasterFilterChip(modifier: Modifier = Modifier) {
-
+fun MapDisasterFilterChip(modifier: Modifier = Modifier) {
     val filterBencana = arrayListOf(
         ChipModel(
             title = "Banjir",
@@ -151,7 +153,6 @@ fun MapdisasterFilterChip(modifier: Modifier = Modifier) {
     val selectedChipItem = remember {
         mutableStateListOf<ChipModel>()
     }
-
 
     FilterChipGroup(
         chipItems = filterBencana,
