@@ -1,4 +1,4 @@
-package com.example.finalprojectgg.ui.screens
+package com.example.finalprojectgg.ui.screens.mapdisaster
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
@@ -33,7 +34,8 @@ import com.example.finalprojectgg.ui.components.DisasterItem
 import com.example.finalprojectgg.ui.components.FilterChipGroup
 import com.example.finalprojectgg.ui.components.FullHeightBottomSheet
 import com.example.finalprojectgg.ui.components.States
-import com.example.finalprojectgg.ui.view_model.MainViewModel
+import com.example.finalprojectgg.ui.screens.mapdisaster.components.MapView
+import com.example.finalprojectgg.ui.viewmodel.MainViewModel
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -45,20 +47,24 @@ fun MapDisasterScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.primary)
     ) {
+        MapView(mapState = viewModel.mapState)
+
         Box(
             Modifier
                 .fillMaxSize()
                 .padding(top = paddingValues.calculateTopPadding())
         ) {
             val swipeableState = rememberSwipeableState(initialValue = States.PEEK)
+            val scrollState = rememberLazyListState()
 
             viewModel.updateMapBottomSheetState(swipeableState)
+            viewModel.updateTopAppBarState(scrollState)
 
             MapDisasterFilterChip()
             FullHeightBottomSheet(
                 swipeableState = swipeableState,
+                scrollState = scrollState
             ) {
                 items(10) {
                     if (it == 0) {

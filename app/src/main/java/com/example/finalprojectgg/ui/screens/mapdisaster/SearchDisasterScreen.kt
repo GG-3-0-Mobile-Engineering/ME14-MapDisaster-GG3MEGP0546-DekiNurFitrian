@@ -1,4 +1,4 @@
-package com.example.finalprojectgg.ui.screens
+package com.example.finalprojectgg.ui.screens.mapdisaster
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box

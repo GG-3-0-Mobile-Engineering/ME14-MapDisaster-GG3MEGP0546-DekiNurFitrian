@@ -2,18 +2,15 @@ package com.example.finalprojectgg.ui.navigation
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
-import com.example.finalprojectgg.ui.screens.MainScreen
-import com.example.finalprojectgg.ui.screens.MapDisasterScreen
-import com.example.finalprojectgg.ui.screens.ProfileScreen
-import com.example.finalprojectgg.ui.screens.SearchDisasterScreen
-import com.example.finalprojectgg.ui.screens.SplashScreen
-import com.example.finalprojectgg.ui.view_model.MainViewModel
+import com.example.finalprojectgg.ui.screens.mapdisaster.MapDisasterScreen
+import com.example.finalprojectgg.ui.screens.profile.ProfileScreen
+import com.example.finalprojectgg.ui.screens.mapdisaster.SearchDisasterScreen
+import com.example.finalprojectgg.ui.screens.splash.SplashScreen
+import com.example.finalprojectgg.ui.viewmodel.MainViewModel
 
 @Composable
 fun AppNavGraph(

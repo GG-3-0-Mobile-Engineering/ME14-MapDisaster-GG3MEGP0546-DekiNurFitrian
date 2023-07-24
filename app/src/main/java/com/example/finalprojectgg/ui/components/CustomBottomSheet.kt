@@ -1,5 +1,6 @@
 package com.example.finalprojectgg.ui.components
 
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Arrangement
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.SwipeableState
@@ -42,12 +44,11 @@ enum class States {
 @Composable
 fun FullHeightBottomSheet(
     swipeableState: SwipeableState<States>,
+    scrollState: LazyListState,
     peekSize: Dp = 60.dp,
     header: @Composable (() -> Unit)? = null,
     body: LazyListScope.() -> Unit
 ) {
-    val scrollState = rememberLazyListState()
-
     BoxWithConstraints() {
         val constraintsScope = this
         val peekValue = with(LocalDensity.current) {

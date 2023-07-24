@@ -1,4 +1,4 @@
-package com.example.finalprojectgg.ui.screens
+package com.example.finalprojectgg.ui.screens.splash
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -28,7 +28,7 @@ fun SplashScreen(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        LaunchedEffect(key1 = true){
+        LaunchedEffect(key1 = true) {
             delay(2000)
             navToMainScreen()
         }

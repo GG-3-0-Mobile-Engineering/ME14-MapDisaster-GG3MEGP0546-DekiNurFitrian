@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun CustomTextField(
     modifier: Modifier = Modifier,
+    readOnly:Boolean,
     value: String,
     onValueChange: (String) -> Unit,
     placeholder: @Composable () -> Unit,
@@ -30,7 +31,7 @@ fun CustomTextField(
         onValueChange = onValueChange,
         textStyle = textStyle,
         modifier = modifier,
-        readOnly = true,
+        readOnly = readOnly,
         interactionSource = interactionSource
     ) {
         TextFieldDefaults.TextFieldDecorationBox(

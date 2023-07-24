@@ -117,4 +117,13 @@ dependencies {
     //Search Bar
     implementation 'com.github.Breens-Mbaka:Searchable-Dropdown-Menu-Jetpack-Compose:0.2.8'
 
+    // Compose dependencies
+    implementation "androidx.lifecycle:lifecycle-viewmodel-compose:2.4.1"
+    implementation "androidx.compose.material:material-icons-extended:$compose_ui_version"
+    implementation "com.google.maps.android:maps-compose:1.0.0"
+
+    // Google Maps
+    implementation "com.google.android.gms:play-services-maps:18.0.2"
+
+
 }
