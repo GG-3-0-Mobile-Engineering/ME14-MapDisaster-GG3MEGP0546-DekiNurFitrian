@@ -58,8 +58,12 @@ fun MapDisasterScreen(
             val swipeableState = rememberSwipeableState(initialValue = States.PEEK)
             val scrollState = rememberLazyListState()
 
-            viewModel.updateMapBottomSheetState(swipeableState)
-            viewModel.updateTopAppBarState(scrollState)
+            viewModel.onMapScreenEvent(
+                MapScreenEvent.BottomSheetChanged(
+                    scrollState = scrollState,
+                    swipeableState = swipeableState
+                )
+            )
 
             MapDisasterFilterChip()
             FullHeightBottomSheet(

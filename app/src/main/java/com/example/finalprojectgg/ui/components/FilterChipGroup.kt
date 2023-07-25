@@ -2,26 +2,20 @@ package com.example.finalprojectgg.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.material.Chip
 import androidx.compose.material.ChipDefaults
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.FilterChip
 import androidx.compose.material.Icon
-import androidx.compose.material.SelectableChipColors
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Build
-import androidx.compose.material3.ElevatedFilterChip
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 import com.example.finalprojectgg.domain.model.ChipModel
@@ -39,7 +33,7 @@ fun FilterChipGroup(
     ) {
 
         items(chipItems.size) { index: Int ->
-            val filterBencanaItem = chipItems[index]
+            val item = chipItems[index]
             var selected by remember {
                 mutableStateOf(false)
             }
@@ -49,12 +43,12 @@ fun FilterChipGroup(
                 onClick = {
                     selected = when (selected) {
                         true -> {
-                            selectedItem.remove(filterBencanaItem)
+                            selectedItem.remove(item)
                             false
                         }
 
                         false -> {
-                            selectedItem.add(filterBencanaItem)
+                            selectedItem.add(item)
                             true
                         }
                     }
@@ -74,7 +68,7 @@ fun FilterChipGroup(
                     selectedLeadingIconColor = MaterialTheme.colorScheme.onPrimary
                 )
             ) {
-                Text(text = filterBencanaItem.title, style = MaterialTheme.typography.labelMedium)
+                Text(text = item.title, style = MaterialTheme.typography.labelMedium)
             }
         }
     }

@@ -1,45 +1,69 @@
 package com.example.finalprojectgg.ui.viewmodel
 
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.SwipeableState
+import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.runtime.*
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import com.example.finalprojectgg.ui.components.States
+import com.example.finalprojectgg.ui.navigation.Screens
+import com.example.finalprojectgg.ui.screens.main.MainScreenEvent
+import com.example.finalprojectgg.ui.screens.main.state.MainScreenViewState
 import com.example.finalprojectgg.ui.screens.main.state.TopAppBarState
-import com.example.finalprojectgg.ui.screens.main.state.TopAppBarViewState
+import com.example.finalprojectgg.ui.screens.mapdisaster.MapScreenEvent
+import com.example.finalprojectgg.ui.screens.mapdisaster.SearchDisasterEvent
+import com.example.finalprojectgg.ui.screens.mapdisaster.SearchDisasterScreenState
 import com.example.finalprojectgg.ui.screens.mapdisaster.state.MapState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 
 @HiltViewModel
 class MainViewModel : ViewModel() {
 
-    private var _mapBottomSheetState = MutableStateFlow(0f)
-    val mapBottomSheetState = _mapBottomSheetState.asStateFlow()
-
     var mapState by mutableStateOf(MapState())
 
-    var topAppBarViewState by mutableStateOf(TopAppBarViewState())
+    var mainScreenViewState = MutableStateFlow(MainScreenViewState())
+
+    var searchDisasterScreenState = MutableStateFlow(SearchDisasterScreenState())
 
     @OptIn(ExperimentalMaterialApi::class)
-    fun updateMapBottomSheetState(swipeableState: SwipeableState<States>) {
-        val threshold by derivedStateOf { swipeableState.offset.value <= 100f }
-        if (threshold) {
-            _mapBottomSheetState.value = 1f - (swipeableState.offset.value / 100f)
-        } else {
-            _mapBottomSheetState.value = 0f
+    fun onMapScreenEvent(event: MapScreenEvent) {
+        when (event) {
+            is MapScreenEvent.BottomSheetChanged -> {
+                val sheetOffset by event.swipeableState.offset
+                val sheetOffsetThreshold by derivedStateOf { sheetOffset <= 100f }
+
+                mainScreenViewState.value = if (sheetOffsetThreshold) {
+                    mainScreenViewState.value.copy(topAppBarAlpha = 1f - (sheetOffset / 100f))
+                } else {
+                    mainScreenViewState.value.copy(topAppBarAlpha = 0f)
+                }
+
+                val sheetContentThreshold by derivedStateOf {
+                    event.scrollState.firstVisibleItemIndex == 0 && event.scrollState.firstVisibleItemScrollOffset <= 50
+                }
+                mainScreenViewState.value = if (sheetContentThreshold) {
+                    mainScreenViewState.value.copy(topAppBarState = TopAppBarState.SEARCH)
+                } else {
+                    mainScreenViewState.value.copy(topAppBarState = TopAppBarState.DETAIL)
+                }
+            }
         }
     }
 
-    fun updateTopAppBarState(listState: LazyListState) {
-        val threshold by derivedStateOf { listState.firstVisibleItemScrollOffset <= 50 }
-        topAppBarViewState = if (threshold) {
-            topAppBarViewState.copy(state = TopAppBarState.SEARCH)
-        } else {
-            topAppBarViewState.copy(state = TopAppBarState.DETAIL)
+
+    fun onMainScreenEvent(event: MainScreenEvent){
+        when (event){
+            is MainScreenEvent.ScreenChanged -> {
+                mainScreenViewState.value = if (event.currentScreenActive == Screens.MapDisasterSearch.route){
+                     mainScreenViewState.value.copy(searchEnabled = true)
+                } else {
+                    mainScreenViewState.value.copy(searchEnabled = false)
+                }
+            }
+            is MainScreenEvent.FilterClicked -> {
+                searchDisasterScreenState.value.filterClicked.invoke()
+            }
         }
     }
+
 }

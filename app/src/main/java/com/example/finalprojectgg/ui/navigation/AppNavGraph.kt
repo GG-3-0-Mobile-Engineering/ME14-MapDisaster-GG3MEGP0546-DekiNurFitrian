@@ -44,7 +44,7 @@ fun AppNavGraph(
             composable(
                 route = Screens.MapDisasterSearch.route
             ) {
-                SearchDisasterScreen()
+                SearchDisasterScreen(viewModel = viewModel)
             }
             composable(
                 route = Screens.Profile.route

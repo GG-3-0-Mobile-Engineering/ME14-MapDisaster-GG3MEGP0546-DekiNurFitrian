@@ -1,22 +1,15 @@
 package com.example.finalprojectgg.ui.screens.main
 
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.background
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.IconButton
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Place
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -24,17 +17,12 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.*
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -44,7 +32,6 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.finalprojectgg.ui.components.CustomTextField
 import com.example.finalprojectgg.ui.navigation.AppNavGraph
 import com.example.finalprojectgg.ui.navigation.Screens
 import com.example.finalprojectgg.ui.screens.main.components.DetailBarView
@@ -68,11 +55,8 @@ fun MainScreen(
     var topBarState by rememberSaveable {
         mutableStateOf(false)
     }
-    val topBarAlphaState by viewModel.mapBottomSheetState.collectAsStateWithLifecycle()
 
-    val topAppBarState = viewModel.topAppBarViewState
-
-
+    val mainScreenViewState by viewModel.mainScreenViewState.collectAsStateWithLifecycle()
 
     when (currentDestination) {
         Screens.MapDisaster.route -> {
@@ -83,6 +67,7 @@ fun MainScreen(
         Screens.MapDisasterSearch.route -> {
             bottomBarState = false
             topBarState = true
+            mainScreenViewState.topAppBarAlpha = 1f
         }
 
         Screens.Profile.route -> {
@@ -94,7 +79,9 @@ fun MainScreen(
             bottomBarState = false
             topBarState = false
         }
+
     }
+    viewModel.onMainScreenEvent(MainScreenEvent.ScreenChanged(currentScreenActive = currentDestination))
 
     Scaffold(
         topBar = {
@@ -102,7 +89,7 @@ fun MainScreen(
                 enter = slideInVertically { -it },
                 exit = slideOutVertically { -it }) {
                 TopAppBar(
-                    backgroundColor = MaterialTheme.colorScheme.surface.copy(alpha = topBarAlphaState),
+                    backgroundColor = MaterialTheme.colorScheme.surface.copy(alpha = mainScreenViewState.topAppBarAlpha),
                     elevation = 0.dp
                 ) {
                     Column(
@@ -110,11 +97,18 @@ fun MainScreen(
                             .fillMaxWidth()
                             .padding(horizontal = 8.dp, vertical = 8.dp),
                     ) {
-                        Log.d("Main", "${topAppBarState.state}")
-                        when (topAppBarState.state) {
+                        when (mainScreenViewState.topAppBarState) {
                             TopAppBarState.SEARCH -> SearchBarView(
-                                navController = navController,
-                                searchEnabled = topAppBarState.searchEnabled
+                                searchEnabled = mainScreenViewState.searchEnabled,
+                                onSearchClicked = {
+                                    navController.navigate(Screens.MapDisasterSearch.route)
+                                },
+                                onLeadingIconClicked = {
+                                    navController.navigate(Screens.MapDisaster.route)
+                                },
+                                onTrailingIconClicked = {
+                                    viewModel.onMainScreenEvent(MainScreenEvent.FilterClicked)
+                                }
                             )
 
                             TopAppBarState.DETAIL -> DetailBarView()
@@ -132,10 +126,16 @@ fun MainScreen(
         },
     ) {
         Box(
-            modifier = modifier.padding(bottom = it.calculateBottomPadding()),
-        ) {
-            AppNavGraph(paddingValues = it, navController = navController, viewModel = viewModel)
-        }
+            modifier = modifier.then(
+                if (topBarState) {
+                    Modifier.padding(bottom = it.calculateBottomPadding())
+                } else {
+                    Modifier.padding(it)
+                }
+            )
+        ){
+        AppNavGraph(paddingValues = it, navController = navController, viewModel = viewModel)
+    }
     }
 }
 

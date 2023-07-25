@@ -24,7 +24,6 @@ fun CustomTextField(
     placeholder: @Composable () -> Unit,
     textStyle: TextStyle,
     colors: TextFieldColors,
-    interactionSource: MutableInteractionSource
 ) {
     BasicTextField(
         value = value,
@@ -32,7 +31,6 @@ fun CustomTextField(
         textStyle = textStyle,
         modifier = modifier,
         readOnly = readOnly,
-        interactionSource = interactionSource
     ) {
         TextFieldDefaults.TextFieldDecorationBox(
             value = value,
