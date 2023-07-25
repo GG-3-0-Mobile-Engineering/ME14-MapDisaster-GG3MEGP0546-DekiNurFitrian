@@ -125,5 +125,9 @@ dependencies {
     // Google Maps
     implementation "com.google.android.gms:play-services-maps:18.0.2"
 
+    //MaxKeppeler Date Picker
+    implementation "com.maxkeppeler.sheets-compose-dialogs:core:$maxkeppeler"
+    implementation "com.maxkeppeler.sheets-compose-dialogs:calendar:$maxkeppeler"
+
 
 }

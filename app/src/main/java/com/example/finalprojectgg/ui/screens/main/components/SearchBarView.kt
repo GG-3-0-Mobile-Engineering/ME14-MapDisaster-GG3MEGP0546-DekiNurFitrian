@@ -35,6 +35,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -53,6 +54,7 @@ fun SearchBarView(
     val focusRequester = remember {
         FocusRequester()
     }
+    val focusManager = LocalFocusManager.current
     Row(
         Modifier
             .height(57.dp)
@@ -86,7 +88,7 @@ fun SearchBarView(
                 readOnly = false
             )
 
-            LaunchedEffect(Unit){
+            LaunchedEffect(Unit) {
                 focusRequester.requestFocus()
             }
         } else {
@@ -99,7 +101,10 @@ fun SearchBarView(
             )
         }
         AnimatedVisibility(visible = searchEnabled, enter = fadeIn(), exit = fadeOut()) {
-            IconButton(onClick = { onTrailingIconClicked() }) {
+            IconButton(onClick = {
+                onTrailingIconClicked()
+                focusManager.clearFocus()
+            }) {
                 Icon(imageVector = Icons.Outlined.FilterList, contentDescription = null)
             }
         }

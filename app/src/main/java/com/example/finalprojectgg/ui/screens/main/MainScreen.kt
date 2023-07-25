@@ -133,9 +133,9 @@ fun MainScreen(
                     Modifier.padding(it)
                 }
             )
-        ){
-        AppNavGraph(paddingValues = it, navController = navController, viewModel = viewModel)
-    }
+        ) {
+            AppNavGraph(paddingValues = it, navController = navController, viewModel = viewModel)
+        }
     }
 }
 
