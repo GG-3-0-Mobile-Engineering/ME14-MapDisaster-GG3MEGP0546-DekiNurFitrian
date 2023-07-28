@@ -1,29 +1,101 @@
 package com.example.finalprojectgg.ui.viewmodel
 
+import android.util.Log
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.runtime.*
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.finalprojectgg.data.Resource
+import com.example.finalprojectgg.domain.model.ChipModel
+import com.example.finalprojectgg.domain.model.Report
+import com.example.finalprojectgg.domain.model.listReportDummy
+import com.example.finalprojectgg.domain.usecase.MapDisasterUseCase
 import com.example.finalprojectgg.ui.navigation.Screens
 import com.example.finalprojectgg.ui.screens.main.MainScreenEvent
 import com.example.finalprojectgg.ui.screens.main.state.MainScreenViewState
 import com.example.finalprojectgg.ui.screens.main.state.TopAppBarState
-import com.example.finalprojectgg.ui.screens.mapdisaster.MapScreenEvent
-import com.example.finalprojectgg.ui.screens.mapdisaster.SearchDisasterEvent
-import com.example.finalprojectgg.ui.screens.mapdisaster.SearchDisasterScreenState
-import com.example.finalprojectgg.ui.screens.mapdisaster.state.MapState
+import com.example.finalprojectgg.ui.screens.mapdisaster.map.MapStyle
+import com.example.finalprojectgg.ui.screens.mapdisaster.map.state.MapScreenEvent
+import com.example.finalprojectgg.ui.screens.mapdisaster.search.state.SearchDisasterScreenState
+import com.example.finalprojectgg.ui.screens.mapdisaster.map.state.MapState
+import com.example.finalprojectgg.ui.screens.profile.state.ProfileScreenEvent
+import com.google.android.gms.maps.model.MapStyleOptions
+import com.google.maps.android.compose.MapProperties
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.updateAndGet
+import kotlinx.coroutines.launch
+import javax.inject.Inject
+import kotlin.math.roundToInt
 
 @HiltViewModel
-class MainViewModel : ViewModel() {
+class MainViewModel @Inject constructor(private val mapDisasterUseCase: MapDisasterUseCase) :
+    ViewModel() {
+    val predicates = listOf(
+        { value: String -> value == "Banjir" },
+        { value: String -> value == "Gempabumi" },
+        { value: String -> value == "Angin Kencang" },
+        { value: String -> value == "Kabut Asap" },
+        { value: String -> value == "Kebakaran Hutan" },
+        { value: String -> value == "Gunung Api" },
+    )
 
-    var mapState by mutableStateOf(MapState())
-
+    private val reports = MutableStateFlow(listReportDummy)
+    var mapScreenViewState = MutableStateFlow(MapState())
+        private set
     var mainScreenViewState = MutableStateFlow(MainScreenViewState())
+        private set
+    var searchDisasterScreenViewState = MutableStateFlow(SearchDisasterScreenState())
+        private set
+    var themeState = mutableStateOf(false)
+        private set
 
-    var searchDisasterScreenState = MutableStateFlow(SearchDisasterScreenState())
+    var list = mutableStateListOf<ChipModel>()
+
+    var filterState: SnapshotStateList<ChipModel> = mutableStateListOf()
+        private set
+
+    val filterdReport = flow<List<Report>> {
+        if (filterState.isEmpty()) {
+            Log.d("Filter","Emit")
+            Log.d("Filter",filterState.size.toString())
+            emit(reports.value)
+        } else {
+            Log.d("Filter","Emit Filter")
+            Log.d("Filter",filterState.size.toString())
+            emit(reports.value.filter {report ->
+                report.category == "Banjir"
+            })
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), listOf())
+
+    init {
+        if (themeState.value) {
+            mapScreenViewState.value = mapScreenViewState.value.copy(
+                properties = MapProperties(
+                    mapStyleOptions = MapStyleOptions(MapStyle.darkMapStyle)
+                )
+            )
+        } else {
+            mapScreenViewState.value = mapScreenViewState.value.copy(
+                properties = MapProperties(
+                    mapStyleOptions = MapStyleOptions(MapStyle.lightMapStyle)
+                )
+            )
+        }
+    }
 
     @OptIn(ExperimentalMaterialApi::class)
     fun onMapScreenEvent(event: MapScreenEvent) {
@@ -34,6 +106,8 @@ class MainViewModel : ViewModel() {
 
                 mainScreenViewState.value = if (sheetOffsetThreshold) {
                     mainScreenViewState.value.copy(topAppBarAlpha = 1f - (sheetOffset / 100f))
+                } else if (sheetOffset == 0f) {
+                    mainScreenViewState.value.copy(topAppBarAlpha = 1f)
                 } else {
                     mainScreenViewState.value.copy(topAppBarAlpha = 0f)
                 }
@@ -47,23 +121,57 @@ class MainViewModel : ViewModel() {
                     mainScreenViewState.value.copy(topAppBarState = TopAppBarState.DETAIL)
                 }
             }
+
+            is MapScreenEvent.getReports -> {
+            }
         }
     }
 
 
-    fun onMainScreenEvent(event: MainScreenEvent){
-        when (event){
+    fun onMainScreenEvent(event: MainScreenEvent) {
+        when (event) {
             is MainScreenEvent.ScreenChanged -> {
-                mainScreenViewState.value = if (event.currentScreenActive == Screens.MapDisasterSearch.route){
-                     mainScreenViewState.value.copy(searchEnabled = true)
-                } else {
-                    mainScreenViewState.value.copy(searchEnabled = false)
-                }
+                mainScreenViewState.value =
+                    if (event.currentScreenActive == Screens.MapDisasterSearch.route) {
+                        mainScreenViewState.value.copy(searchEnabled = true)
+                    } else {
+                        mainScreenViewState.value.copy(searchEnabled = false)
+                    }
             }
+
             is MainScreenEvent.FilterClicked -> {
-                searchDisasterScreenState.value.filterClicked.invoke()
+                searchDisasterScreenViewState.value.filterClicked.invoke()
             }
         }
+    }
+
+    fun onProfileScreenEvent(event: ProfileScreenEvent) {
+        when (event) {
+            is ProfileScreenEvent.ThemeSwitchChanged -> {
+                themeState.value = !themeState.value
+                if (themeState.value) {
+                    mapScreenViewState.value = mapScreenViewState.value.copy(
+                        properties = MapProperties(
+                            mapStyleOptions = MapStyleOptions(MapStyle.darkMapStyle)
+                        )
+                    )
+                } else {
+                    mapScreenViewState.value = mapScreenViewState.value.copy(
+                        properties = MapProperties(
+                            mapStyleOptions = MapStyleOptions(MapStyle.lightMapStyle)
+                        )
+                    )
+                }
+            }
+        }
+    }
+
+    fun onFilterAdded(data: ChipModel) {
+        filterState.add(data)
+    }
+
+    fun onFilterDeleted(data: ChipModel) {
+        filterState.remove(data)
     }
 
 }

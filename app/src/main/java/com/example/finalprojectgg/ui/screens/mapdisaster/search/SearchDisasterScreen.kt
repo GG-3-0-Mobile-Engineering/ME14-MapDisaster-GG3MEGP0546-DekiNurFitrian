@@ -1,4 +1,4 @@
-package com.example.finalprojectgg.ui.screens.mapdisaster
+package com.example.finalprojectgg.ui.screens.mapdisaster.search
 
 import android.os.Build
 import android.util.Range
@@ -12,25 +12,18 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.staggeredgrid.LazyHorizontalStaggeredGrid
-import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
-import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.material.Chip
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Build
@@ -48,13 +41,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.util.toRange
 import com.example.finalprojectgg.domain.model.ChipModel
+import com.example.finalprojectgg.domain.model.listDisaster
+import com.example.finalprojectgg.domain.model.listProvince
 import com.example.finalprojectgg.ui.components.DisasterItem
 import com.example.finalprojectgg.ui.components.FilterChipGroup
 import com.example.finalprojectgg.ui.components.FlowRow
@@ -69,22 +62,25 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
-@OptIn(ExperimentalMaterialApi::class)
+@RequiresApi(Build.VERSION_CODES.O)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun SearchDisasterScreen(
     modifier: Modifier = Modifier,
     viewModel: MainViewModel
 ) {
-    Box(modifier = modifier.fillMaxSize()) {
-        val sheetStateFilter =
-            rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.surface)
+    ) {
+        val sheetStateFilter = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.HalfExpanded)
         val scope = rememberCoroutineScope()
         var isTransitionAnimation by remember { mutableStateOf(true) }
-        val searchDisasterScreenState = viewModel.searchDisasterScreenState
+        val searchDisasterScreenState = viewModel.searchDisasterScreenViewState
 
-        LaunchedEffect(key1 = this) {
+        LaunchedEffect(Unit) {
             launch {
-                isTransitionAnimation = true
                 delay(500)
                 isTransitionAnimation = false
             }
@@ -96,18 +92,19 @@ fun SearchDisasterScreen(
                 }
             }
         }
+        Column {
+            FilterSearchDisasterChipActive()
+            SearchDisasterListView()
+        }
 
         ModalBottomSheetLayout(
             sheetState = sheetStateFilter,
+            sheetBackgroundColor = MaterialTheme.colorScheme.surface,
+            sheetContentColor = MaterialTheme.colorScheme.onSurface,
             sheetContent = {
-                if (!isTransitionAnimation) {
-                    FilterSheet()
-                }
-            }) {
-            Column {
-                FilterSearchDisasterChipActive()
-                SearchDisasterListView()
-            }
+            FilterSheet()
+        }) {
+
         }
     }
 }
@@ -119,11 +116,9 @@ fun SearchDisasterScreen(
 )
 @Composable
 fun FilterSheet() {
-    Column(
+    Box(
         modifier = Modifier
-            .fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(24.dp)
+            .fillMaxSize()
     ) {
         val calendarState = rememberUseCaseState()
         val timeBoundary = LocalDate.now().let { now -> now.minusYears(2)..now }
@@ -133,62 +128,6 @@ fun FilterSheet() {
             mutableStateOf(default.toRange())
         }
 
-        val filterBencana = arrayListOf(
-            ChipModel(
-                title = "sdfasdf",
-                icon = {
-                    Icon(imageVector = Icons.Default.Build, contentDescription = null)
-                }
-            ),
-            ChipModel(
-                title = "sdf",
-                icon = {
-                    Icon(imageVector = Icons.Default.Build, contentDescription = null)
-                }
-            ),
-            ChipModel(
-                title = "fsdf asdf sdfa",
-                icon = {
-                    Icon(imageVector = Icons.Default.Build, contentDescription = null)
-                }
-            ),
-            ChipModel(
-                title = "assdf",
-                icon = {
-                    Icon(imageVector = Icons.Default.Build, contentDescription = null)
-                }
-            ),
-            ChipModel(
-                title = "asdfas asdf ",
-                icon = {
-                    Icon(imageVector = Icons.Default.Build, contentDescription = null)
-                }
-            ),
-            ChipModel(
-                title = "asdf sdfa ",
-                icon = {
-                    Icon(imageVector = Icons.Default.Build, contentDescription = null)
-                }
-            ),
-            ChipModel(
-                title = "asdfasdf asdf",
-                icon = {
-                    Icon(imageVector = Icons.Default.Build, contentDescription = null)
-                }
-            ),
-            ChipModel(
-                title = "Banjir",
-                icon = {
-                    Icon(imageVector = Icons.Default.Build, contentDescription = null)
-                }
-            ),
-            ChipModel(
-                title = "asdf sfadf",
-                icon = {
-                    Icon(imageVector = Icons.Default.Build, contentDescription = null)
-                }
-            ),
-        )
         CalendarDialog(
             state = calendarState,
             selection = CalendarSelection.Period(
@@ -203,99 +142,125 @@ fun FilterSheet() {
                 style = CalendarStyle.MONTH,
             ),
         )
-        Box(
-            Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .padding(top = 8.dp)
-        ) {
-            Spacer(
-                modifier = Modifier
-                    .height(4.dp)
-                    .width(24.dp)
-                    .clip(ShapeDefaults.ExtraLarge)
-                    .background(MaterialTheme.colorScheme.outline)
-                    .align(Alignment.TopCenter)
 
-            )
-            Text(
-                text = "Filter",
-                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                modifier = Modifier.padding(vertical = 8.dp)
-            )
-
-        }
         Column(
-            Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
+            modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-            Text(
-                text = "Rentang Waktu",
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Row(Modifier.fillMaxWidth()) {
-                Box(
+            Box(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .padding(top = 8.dp)
+            ) {
+                Spacer(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(32.dp)
-                        .weight(1f)
-                        .border(
-                            width = 0.5.dp,
-                            color = MaterialTheme.colorScheme.outline,
-                            shape = MaterialTheme.shapes.medium
-                        )
-                        .clickable {
-                            calendarState.show()
-                        },
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(text = "Awal Waktu")
-                }
+                        .height(4.dp)
+                        .width(24.dp)
+                        .clip(ShapeDefaults.ExtraLarge)
+                        .background(MaterialTheme.colorScheme.outline)
+                        .align(Alignment.TopCenter)
 
-                Spacer(modifier = Modifier.width(16.dp))
+                )
+                Text(
+                    text = "Filter",
+                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
 
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(32.dp)
-                        .weight(1f)
-                        .border(
-                            width = 0.5.dp,
-                            color = MaterialTheme.colorScheme.outline,
-                            shape = MaterialTheme.shapes.medium
-                        )
-                        .clickable {
-                            calendarState.show()
-                        },
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(text = "Akhir Waktu")
+            }
+
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+            ) {
+                Text(
+                    text = "Rentang Waktu",
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(Modifier.fillMaxWidth()) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(32.dp)
+                            .weight(1f)
+                            .border(
+                                width = 0.5.dp,
+                                color = MaterialTheme.colorScheme.outline,
+                                shape = MaterialTheme.shapes.medium
+                            )
+                            .clickable {
+                                calendarState.show()
+                            },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(text = "Awal Waktu")
+                    }
+
+                    Spacer(modifier = Modifier.width(16.dp))
+
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(32.dp)
+                            .weight(1f)
+                            .border(
+                                width = 0.5.dp,
+                                color = MaterialTheme.colorScheme.outline,
+                                shape = MaterialTheme.shapes.medium
+                            )
+                            .clickable {
+                                calendarState.show()
+                            },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(text = "Akhir Waktu")
+                    }
                 }
             }
-        }
 
-        Column(
-            Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-        ) {
-            Text(
-                text = "Lokasi",
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            FlowRow() {
-                repeat(filterBencana.size) {
-                    val item = filterBencana[it]
-                    Chip(modifier = Modifier.padding(end = 8.dp), onClick = { /*TODO*/ }) {
-                        Text(text = item.title)
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+            ) {
+                Text(
+                    text = "Filter",
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                FlowRow() {
+                    repeat(listDisaster.size) {
+                        val item = listDisaster[it]
+                        Chip(modifier = Modifier.padding(end = 8.dp), onClick = { /*TODO*/ }) {
+                            Text(text = item.title)
+                        }
+                    }
+                }
+            }
+
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+            ) {
+                Text(
+                    text = "Lokasi",
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                FlowRow() {
+                    repeat(listProvince.size) {
+                        val item = listProvince[it]
+                        Chip(modifier = Modifier.padding(end = 8.dp), onClick = { /*TODO*/ }) {
+                            Text(text = item.title)
+                        }
                     }
                 }
             }
         }
-
 
     }
 }
@@ -353,7 +318,10 @@ fun FilterSearchDisasterChipActive() {
         )
         Text(
             text = "Filter :",
-            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold)
+            style = MaterialTheme.typography.labelMedium.copy(
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
         )
         FilterChipGroup(chipItems = filterBencana, selectedItem = selectedChipItem)
     }
@@ -368,7 +336,7 @@ fun SearchDisasterListView() {
         verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
         items(10) {
-            DisasterItem()
+//            DisasterItem()
         }
     }
 }

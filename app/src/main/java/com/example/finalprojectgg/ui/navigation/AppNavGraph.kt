@@ -1,5 +1,7 @@
 package com.example.finalprojectgg.ui.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -8,12 +10,13 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
-import com.example.finalprojectgg.ui.screens.mapdisaster.MapDisasterScreen
+import com.example.finalprojectgg.ui.screens.mapdisaster.map.MapDisasterScreen
 import com.example.finalprojectgg.ui.screens.profile.ProfileScreen
-import com.example.finalprojectgg.ui.screens.mapdisaster.SearchDisasterScreen
+import com.example.finalprojectgg.ui.screens.mapdisaster.search.SearchDisasterScreen
 import com.example.finalprojectgg.ui.screens.splash.SplashScreen
 import com.example.finalprojectgg.ui.viewmodel.MainViewModel
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AppNavGraph(
     paddingValues: PaddingValues,
@@ -39,19 +42,20 @@ fun AppNavGraph(
             composable(
                 route = Screens.MapDisaster.route
             ) {
-                MapDisasterScreen(paddingValues, viewModel) {
-                    navController.navigate(Screens.MapDisasterSearch.route)
-                }
+                MapDisasterScreen(paddingValues, viewModel)
             }
             composable(
                 route = Screens.MapDisasterSearch.route
             ) {
-                SearchDisasterScreen(modifier = Modifier.padding(top = paddingValues.calculateTopPadding()),viewModel = viewModel)
+                SearchDisasterScreen(
+                    modifier = Modifier.padding(top = paddingValues.calculateTopPadding()),
+                    viewModel = viewModel
+                )
             }
             composable(
                 route = Screens.Profile.route
             ) {
-                ProfileScreen()
+                ProfileScreen(viewModel)
             }
 
         }

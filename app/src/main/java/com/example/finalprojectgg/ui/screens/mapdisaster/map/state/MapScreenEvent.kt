@@ -1,4 +1,4 @@
-package com.example.finalprojectgg.ui.screens.mapdisaster
+package com.example.finalprojectgg.ui.screens.mapdisaster.map.state
 
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material.ExperimentalMaterialApi
@@ -10,4 +10,7 @@ sealed class MapScreenEvent {
         val swipeableState: SwipeableState<States>,
         val scrollState:LazyListState
     ) : MapScreenEvent()
+
+    object getReports:MapScreenEvent()
+
 }

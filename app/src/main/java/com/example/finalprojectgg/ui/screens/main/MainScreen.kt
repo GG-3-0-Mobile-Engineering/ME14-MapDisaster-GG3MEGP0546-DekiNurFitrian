@@ -1,5 +1,7 @@
 package com.example.finalprojectgg.ui.screens.main
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
@@ -8,9 +10,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.TopAppBar
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Place
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -37,9 +36,10 @@ import com.example.finalprojectgg.ui.navigation.Screens
 import com.example.finalprojectgg.ui.screens.main.components.DetailBarView
 import com.example.finalprojectgg.ui.screens.main.components.SearchBarView
 import com.example.finalprojectgg.ui.screens.main.state.TopAppBarState
+import com.example.finalprojectgg.ui.screens.mapdisaster.map.components.MapView
 import com.example.finalprojectgg.ui.viewmodel.MainViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
+@RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true, device = Devices.PIXEL_4)
 @Composable
 fun MainScreen(
@@ -125,6 +125,7 @@ fun MainScreen(
             }
         },
     ) {
+
         Box(
             modifier = modifier.then(
                 if (topBarState) {
@@ -134,6 +135,9 @@ fun MainScreen(
                 }
             )
         ) {
+            val mapState by viewModel.mapScreenViewState.collectAsStateWithLifecycle()
+
+            MapView(mapState = mapState)
             AppNavGraph(paddingValues = it, navController = navController, viewModel = viewModel)
         }
     }
@@ -154,7 +158,7 @@ fun BottomBar(
         screens.map {
             NavigationBarItem(
                 icon = {
-                    Icon(imageVector = Icons.Default.Place, contentDescription = null)
+                    Icon(imageVector = it.icon, contentDescription = null)
                 },
                 label = {
                     Text(text = it.title, style = MaterialTheme.typography.labelMedium)

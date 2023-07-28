@@ -17,14 +17,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 
 import com.example.finalprojectgg.domain.model.ChipModel
+import com.example.finalprojectgg.ui.viewmodel.MainViewModel
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun FilterChipGroup(
     chipItems: List<ChipModel>,
-    selectedItem: SnapshotStateList<ChipModel>
+    selectedItem: SnapshotStateList<ChipModel>,
+    viewModel:MainViewModel = hiltViewModel()
 ) {
     LazyRow(
         userScrollEnabled = true,
@@ -39,16 +42,18 @@ fun FilterChipGroup(
             }
 
             FilterChip(
-                selected = selected,
+                selected = selectedItem.contains(item),
                 onClick = {
                     selected = when (selected) {
                         true -> {
                             selectedItem.remove(item)
+                            viewModel.onFilterDeleted(item)
                             false
                         }
 
                         false -> {
                             selectedItem.add(item)
+                            viewModel.onFilterAdded(item)
                             true
                         }
                     }

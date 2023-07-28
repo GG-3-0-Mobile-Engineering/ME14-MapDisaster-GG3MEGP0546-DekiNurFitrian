@@ -1,4 +1,4 @@
-package com.example.finalprojectgg.ui.screens.mapdisaster
+package com.example.finalprojectgg.ui.screens.mapdisaster.search.state
 
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetState

@@ -1,4 +1,4 @@
-package com.example.finalprojectgg.ui.screens.mapdisaster
+package com.example.finalprojectgg.ui.screens.mapdisaster.map
 
 object MapStyle {
     val darkMapStyle = """
