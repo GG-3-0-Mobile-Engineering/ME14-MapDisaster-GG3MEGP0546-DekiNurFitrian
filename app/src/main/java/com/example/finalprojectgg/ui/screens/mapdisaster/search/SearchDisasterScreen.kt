@@ -278,7 +278,7 @@ fun FilterSearchDisasterChipActive() {
         val selectedChipItem = remember {
             mutableStateListOf<ChipModel>()
         }
-        val filterBencana = arrayListOf(
+        val filterBencana = mutableListOf(
             ChipModel(
                 title = "Banjir",
                 icon = {
@@ -323,7 +323,7 @@ fun FilterSearchDisasterChipActive() {
                 color = MaterialTheme.colorScheme.onSurface
             )
         )
-        FilterChipGroup(chipItems = filterBencana, selectedItem = selectedChipItem)
+//        FilterChipGroup(chipItems = filterBencana, selectedItem = selectedChipItem)
     }
 }
 

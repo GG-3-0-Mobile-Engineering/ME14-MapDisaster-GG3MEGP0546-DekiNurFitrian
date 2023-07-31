@@ -13,7 +13,7 @@ data class ChipModel(
     var icon: @Composable () -> Unit
 )
 
-val listDisaster = arrayListOf(
+val listDisaster = listOf(
     ChipModel(
         title = "Banjir",
         icon = {

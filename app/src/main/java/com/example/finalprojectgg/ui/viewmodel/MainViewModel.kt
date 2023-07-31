@@ -10,6 +10,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.finalprojectgg.data.Resource
 import com.example.finalprojectgg.domain.model.ChipModel
 import com.example.finalprojectgg.domain.model.Report
+import com.example.finalprojectgg.domain.model.listDisaster
 import com.example.finalprojectgg.domain.model.listReportDummy
 import com.example.finalprojectgg.domain.usecase.MapDisasterUseCase
 import com.example.finalprojectgg.ui.navigation.Screens
@@ -24,12 +25,14 @@ import com.example.finalprojectgg.ui.screens.profile.state.ProfileScreenEvent
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.maps.android.compose.MapProperties
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -46,13 +49,7 @@ class MainViewModel @Inject constructor(private val mapDisasterUseCase: MapDisas
     val predicates = listOf(
         { value: String -> value == "Banjir" },
         { value: String -> value == "Gempabumi" },
-        { value: String -> value == "Angin Kencang" },
-        { value: String -> value == "Kabut Asap" },
-        { value: String -> value == "Kebakaran Hutan" },
-        { value: String -> value == "Gunung Api" },
     )
-
-    private val reports = MutableStateFlow(listReportDummy)
     var mapScreenViewState = MutableStateFlow(MapState())
         private set
     var mainScreenViewState = MutableStateFlow(MainScreenViewState())
@@ -64,40 +61,55 @@ class MainViewModel @Inject constructor(private val mapDisasterUseCase: MapDisas
 
     var list = mutableStateListOf<ChipModel>()
 
-    var filterState: SnapshotStateList<ChipModel> = mutableStateListOf()
+    var filterState = mutableStateListOf<ChipModel>().apply {
+        addAll(listDisaster)
+    }
         private set
 
-    val filterdReport = flow<List<Report>> {
-        if (filterState.isEmpty()) {
-            Log.d("Filter","Emit")
-            Log.d("Filter",filterState.size.toString())
-            emit(reports.value)
-        } else {
-            Log.d("Filter","Emit Filter")
-            Log.d("Filter",filterState.size.toString())
-            emit(reports.value.filter {report ->
-                report.category == "Banjir"
-            })
-        }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), listOf())
+    var filterStateFlow = MutableStateFlow(listDisaster.toMutableList())
+        private set
 
     init {
-        if (themeState.value) {
-            mapScreenViewState.value = mapScreenViewState.value.copy(
-                properties = MapProperties(
-                    mapStyleOptions = MapStyleOptions(MapStyle.darkMapStyle)
-                )
-            )
-        } else {
-            mapScreenViewState.value = mapScreenViewState.value.copy(
-                properties = MapProperties(
-                    mapStyleOptions = MapStyleOptions(MapStyle.lightMapStyle)
-                )
-            )
+        Log.d("DATA VM", "INIT")
+        collectFlow()
+    }
+
+
+    private fun collectFlow() {
+        viewModelScope.launch {
+            mapDisasterUseCase.getReports().collect { value ->
+                when (value) {
+                    is Resource.Loading -> {
+                        Log.d("DATA VM", "Loading")
+                        mapScreenViewState.update {
+                            it.copy(isProgress = true, isContent = false)
+                        }
+                    }
+
+                    is Resource.Success -> {
+                        Log.d("DATA VM", "Success")
+                        mapScreenViewState.update { mapState ->
+                            mapState.copy(
+                                data = value.data?.filter { report ->
+                                    predicates.all {
+                                        it(report.category)
+                                    }
+                                } ?: emptyList(),
+                                isProgress = false,
+                                isContent = true
+                            )
+                        }
+                    }
+
+                    is Resource.Error -> {
+                        Log.d("DATA VM", "Error")
+                    }
+                }
+            }
         }
     }
 
-    @OptIn(ExperimentalMaterialApi::class)
+    @OptIn(ExperimentalMaterialApi::class, FlowPreview::class)
     fun onMapScreenEvent(event: MapScreenEvent) {
         when (event) {
             is MapScreenEvent.BottomSheetChanged -> {
@@ -123,6 +135,7 @@ class MainViewModel @Inject constructor(private val mapDisasterUseCase: MapDisas
             }
 
             is MapScreenEvent.getReports -> {
+
             }
         }
     }
@@ -166,12 +179,20 @@ class MainViewModel @Inject constructor(private val mapDisasterUseCase: MapDisas
         }
     }
 
-    fun onFilterAdded(data: ChipModel) {
-        filterState.add(data)
+    fun onChipChanged(index: Int) {
+        val item = filterState[index]
+        val selected = item.selected
+        filterState[index] = item.copy(selected = !selected)
     }
 
-    fun onFilterDeleted(data: ChipModel) {
-        filterState.remove(data)
+    fun onChipChangedSec(chip: ChipModel) {
+        val selected = filterStateFlow.value.contains(chip)
+        val newItem = filterStateFlow.value
+        if (selected) newItem.remove(chip) else newItem.add(chip)
+        filterStateFlow.value = newItem
+        
+
+        Log.d("Filter", filterStateFlow.value.hashCode().toString())
     }
 
 }

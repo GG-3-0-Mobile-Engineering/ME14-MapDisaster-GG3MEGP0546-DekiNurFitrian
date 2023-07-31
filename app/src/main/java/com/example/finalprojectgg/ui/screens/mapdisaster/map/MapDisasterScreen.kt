@@ -1,5 +1,6 @@
 package com.example.finalprojectgg.ui.screens.mapdisaster.map
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.ExperimentalMaterialApi
@@ -21,20 +23,27 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.*
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.finalprojectgg.domain.model.ChipModel
+import com.example.finalprojectgg.domain.model.Report
 import com.example.finalprojectgg.domain.model.listDisaster
 import com.example.finalprojectgg.ui.components.DisasterItem
 import com.example.finalprojectgg.ui.components.FilterChipGroup
 import com.example.finalprojectgg.ui.components.FullHeightBottomSheet
 import com.example.finalprojectgg.ui.components.States
+import com.example.finalprojectgg.ui.components.Test2FilterChipGroup
+import com.example.finalprojectgg.ui.components.TestFilterChipGroup
 import com.example.finalprojectgg.ui.screens.mapdisaster.map.state.MapScreenEvent
 import com.example.finalprojectgg.ui.viewmodel.MainViewModel
+import com.google.android.gms.common.api.internal.LifecycleActivity
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -46,10 +55,11 @@ fun MapDisasterScreen(
         modifier = Modifier
             .fillMaxSize()
     ) {
-        val mapScreenState by viewModel.mapScreenViewState.collectAsStateWithLifecycle()
-        val reports by viewModel.filterdReport.collectAsStateWithLifecycle()
+        val chipState = viewModel.filterState
+        val chipStateFlow by viewModel.filterStateFlow.collectAsState()
+        Log.d("FILTER UI",chipStateFlow.hashCode().toString())
 
-        LaunchedEffect(Unit){
+        LaunchedEffect(Unit) {
             viewModel.onMapScreenEvent(MapScreenEvent.getReports)
         }
 
@@ -68,7 +78,9 @@ fun MapDisasterScreen(
                 )
             )
 
-            MapDisasterFilterChip()
+            MapDisasterFilterChip(chipStateFlow) {
+                viewModel.onChipChangedSec(it)
+            }
             FullHeightBottomSheet(
                 swipeableState = swipeableState,
                 scrollState = scrollState
@@ -106,14 +118,14 @@ fun MapDisasterScreen(
                     }
                 }
 
-                items(reports.size) {
-                    val item = reports[it]
+                items(4) {
                     Box(
                         modifier = Modifier
                             .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f))
                             .padding(24.dp)
                     ) {
-                        DisasterItem(item = item)
+                        Text(text = "Dataaaaaa!")
+//                        DisasterItem(item =  )
                     }
                 }
             }
@@ -123,15 +135,11 @@ fun MapDisasterScreen(
 
 
 @Composable
-fun MapDisasterFilterChip() {
-
-    val selectedChipItem = remember {
-        mutableStateListOf<ChipModel>()
-    }
-
-    FilterChipGroup(
-        chipItems = listDisaster,
-        selectedItem = selectedChipItem
-    )
-
+fun MapDisasterFilterChip(
+    chipState: List<ChipModel>,
+    onItemChipClick: (ChipModel) -> Unit,
+) {
+//    FilterChipGroup(chipState = chipState)
+//    TestFilterChipGroup(chipState = chipState, onItemChipClick = onItemChipClick)
+    Test2FilterChipGroup(chipState = chipState, onItemChipClick = onItemChipClick)
 }

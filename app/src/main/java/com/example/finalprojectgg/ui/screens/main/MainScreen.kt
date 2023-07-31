@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.TopAppBar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -89,6 +90,7 @@ fun MainScreen(
                 enter = slideInVertically { -it },
                 exit = slideOutVertically { -it }) {
                 TopAppBar(
+                    modifier = Modifier.statusBarsPadding(),
                     backgroundColor = MaterialTheme.colorScheme.surface.copy(alpha = mainScreenViewState.topAppBarAlpha),
                     elevation = 0.dp
                 ) {
