@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.ExperimentalMaterialApi
@@ -20,30 +19,20 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.*
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.finalprojectgg.domain.model.ChipModel
-import com.example.finalprojectgg.domain.model.Report
-import com.example.finalprojectgg.domain.model.listDisaster
-import com.example.finalprojectgg.ui.components.DisasterItem
-import com.example.finalprojectgg.ui.components.FilterChipGroup
+import com.example.finalprojectgg.domain.model.listReportDummy
+import com.example.finalprojectgg.ui.screens.mapdisaster.components.DisasterItem
 import com.example.finalprojectgg.ui.components.FullHeightBottomSheet
 import com.example.finalprojectgg.ui.components.States
 import com.example.finalprojectgg.ui.components.Test2FilterChipGroup
-import com.example.finalprojectgg.ui.components.TestFilterChipGroup
 import com.example.finalprojectgg.ui.screens.mapdisaster.map.state.MapScreenEvent
 import com.example.finalprojectgg.ui.viewmodel.MainViewModel
-import com.google.android.gms.common.api.internal.LifecycleActivity
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -110,7 +99,7 @@ fun MapDisasterScreen(
                         ) {
                             Text(
                                 text = "Info Bencana Terkini",
-                                style = MaterialTheme.typography.titleLarge,
+                                style = MaterialTheme.typography.titleMedium,
                                 textAlign = TextAlign.Start,
                                 modifier = Modifier.fillMaxWidth()
                             )
@@ -121,11 +110,9 @@ fun MapDisasterScreen(
                 items(4) {
                     Box(
                         modifier = Modifier
-                            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f))
-                            .padding(24.dp)
+                            .padding(horizontal = 16.dp)
                     ) {
-                        Text(text = "Dataaaaaa!")
-//                        DisasterItem(item =  )
+                        DisasterItem(item = listReportDummy[0] )
                     }
                 }
             }

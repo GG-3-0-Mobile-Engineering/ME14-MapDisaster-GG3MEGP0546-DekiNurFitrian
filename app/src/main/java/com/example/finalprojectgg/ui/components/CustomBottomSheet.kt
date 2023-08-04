@@ -136,7 +136,7 @@ fun FullHeightBottomSheet(
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
                     state = scrollState,
                 ) {
                     body.invoke(this)

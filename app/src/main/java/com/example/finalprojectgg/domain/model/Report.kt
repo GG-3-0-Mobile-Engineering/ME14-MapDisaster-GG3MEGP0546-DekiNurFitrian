@@ -16,7 +16,7 @@ data class Report(
 val listReportDummy = listOf(
     Report(
         title = "Banjir Lagi",
-        desc = "Banjir di sekitaran Semarang Tawang",
+        desc = "Banjir di sekitaran Semarang Tawang,Banjir di sekitaran Semarang Tawang,Banjir di sekitaran Semarang Tawang,Banjir di sekitaran Semarang TawangBanjir di sekitaran Semarang TawangBanjir di sekitaran Semarang TawangBanjir di sekitaran Semarang Tawang",
         date = "2023-27-07T18:03:33:00.176Z",
         status = "confirmed",
         imgUrl = "https://media-cldnry.s-nbcnews.com/image/upload/rockcms/2023-07/230714-vermont-flooding-mjf-1110-55ab42.jpg",
