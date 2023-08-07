@@ -49,141 +49,141 @@ import com.example.finalprojectgg.ui.viewmodel.MainViewModel
 import kotlinx.coroutines.launch
 
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ProfileScreen(
     viewModel: MainViewModel
 ) {
     val themeState by viewModel.themeState
-    Column(
+    Box(
         Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.surface)
     ) {
-
         val sheetState =
             rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
         val corutineScope = rememberCoroutineScope()
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(0.7f)
-        ) {
-            AsyncImage(
-                model = "https://images.unsplash.com/photo-1530893609608-32a9af3aa95c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=764&q=80",
-                contentDescription = null,
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop
-            )
-            Spacer(
+        Column {
+            Box(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.5f))
-            )
-
-            Column(
-                modifier = Modifier.align(Alignment.Center),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.7f)
             ) {
                 AsyncImage(
-                    model = "https://images.unsplash.com/photo-1504593811423-6dd665756598?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
+                    model = "https://images.unsplash.com/photo-1530893609608-32a9af3aa95c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=764&q=80",
                     contentDescription = null,
-                    modifier = Modifier
-                        .size(120.dp)
-                        .clip(CircleShape),
+                    modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop
                 )
-                Spacer(modifier = Modifier.height(24.dp))
-                Text(
-                    text = "Mubariz Mehdizadeh",
-                    style = MaterialTheme.typography.headlineSmall.copy(
-                        fontWeight = FontWeight.Bold,
+                Spacer(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.8f))
+                )
+
+                Column(
+                    modifier = Modifier.align(Alignment.Center),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    AsyncImage(
+                        model = "https://images.unsplash.com/photo-1504593811423-6dd665756598?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(120.dp)
+                            .clip(CircleShape),
+                        contentScale = ContentScale.Crop
+                    )
+                    Spacer(modifier = Modifier.height(24.dp))
+                    Text(
+                        text = "Mubariz Mehdizadeh",
+                        style = MaterialTheme.typography.headlineSmall.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    )
+                    Text(
+                        text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. ",
+                        style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurface
                     )
-                )
-                Text(
-                    text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. ",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
+                }
             }
-        }
 
-        Column(
-            Modifier
-                .padding(horizontal = 24.dp)
-                .graphicsLayer {
-                    translationY = -150f
-                }) {
-            Card(
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            ) {
-                Column(modifier = Modifier.padding(all = 16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.clickable {
-                            corutineScope.launch {
-                                sheetState.show()
-                            }
-                        }) {
-                        Row(
-                            Modifier
-                                .fillMaxWidth()
-                                .weight(1f)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Place,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                text = "Set Default Location",
-                                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
-                            )
-                        }
-                        IconButton(onClick = { /*TODO*/ }) {
-                            Icon(imageVector = Icons.Default.ArrowRight, contentDescription = null)
-                        }
-                    }
-                    Spacer(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(1.dp)
-                            .background(MaterialTheme.colorScheme.outline)
+            Column(
+                Modifier
+                    .padding(horizontal = 24.dp)
+                    .graphicsLayer {
+                        translationY = -100f
+                    }) {
+                Card(
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        contentColor = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                    Row(verticalAlignment = Alignment.CenterVertically) {
+                ) {
+                    Column(modifier = Modifier.padding(all = 16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         Row(
-                            Modifier
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.clickable {
+                                corutineScope.launch {
+                                    sheetState.show()
+                                }
+                            }) {
+                            Row(
+                                Modifier
+                                    .fillMaxWidth()
+                                    .weight(1f)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Place,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = "Set Default Location",
+                                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                                )
+                            }
+                            IconButton(onClick = { /*TODO*/ }) {
+                                Icon(imageVector = Icons.Default.ArrowRight, contentDescription = null)
+                            }
+                        }
+                        Spacer(
+                            modifier = Modifier
                                 .fillMaxWidth()
-                                .weight(1f)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.DarkMode,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                text = "Set Theme",
-                                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                                .height(1.dp)
+                                .background(MaterialTheme.colorScheme.outline)
+                        )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Row(
+                                Modifier
+                                    .fillMaxWidth()
+                                    .weight(1f)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.DarkMode,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = "Set Theme",
+                                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                                )
+                            }
+                            ThemeSwitcher(
+                                darkTheme = themeState,
+                                size = 40.dp,
+                                onClick = {
+                                    viewModel.onProfileScreenEvent(ProfileScreenEvent.ThemeSwitchChanged)
+                                }
                             )
                         }
-                        ThemeSwitcher(
-                            darkTheme = themeState,
-                            size = 40.dp,
-                            onClick = {
-                                viewModel.onProfileScreenEvent(ProfileScreenEvent.ThemeSwitchChanged)
-                            }
-                        )
                     }
                 }
             }
         }
-
         SheetLocationPicker(sheetState)
     }
 }

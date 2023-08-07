@@ -7,6 +7,7 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -130,10 +131,10 @@ fun MainScreen(
 
         Box(
             modifier = modifier.then(
-                if (topBarState) {
-                    Modifier.padding(bottom = it.calculateBottomPadding())
+                if (bottomBarState) {
+                    Modifier.fillMaxSize().padding(bottom = it.calculateBottomPadding())
                 } else {
-                    Modifier.padding(it)
+                    Modifier.fillMaxSize()
                 }
             )
         ) {
