@@ -67,16 +67,16 @@ fun SearchDisasterScreen(
     modifier: Modifier = Modifier,
     viewModel: MainViewModel
 ) {
+    val sheetStateFilter = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
+    var isTransitionAnimation by remember { mutableStateOf(true) }
+    val scope = rememberCoroutineScope()
+    val searchDisasterScreenState = viewModel.searchDisasterScreenViewState
+
     Box(
         modifier = modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.surface)
     ) {
-        val sheetStateFilter = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.HalfExpanded)
-        val scope = rememberCoroutineScope()
-        var isTransitionAnimation by remember { mutableStateOf(true) }
-        val searchDisasterScreenState = viewModel.searchDisasterScreenViewState
-
         LaunchedEffect(Unit) {
             launch {
                 delay(500)
@@ -109,7 +109,7 @@ fun SearchDisasterScreen(
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(
-    ExperimentalFoundationApi::class, ExperimentalMaterialApi::class,
+    ExperimentalMaterialApi::class,
     ExperimentalMaterial3Api::class
 )
 @Composable
@@ -276,44 +276,7 @@ fun FilterSearchDisasterChipActive() {
         val selectedChipItem = remember {
             mutableStateListOf<ChipModel>()
         }
-        val filterBencana = mutableListOf(
-            ChipModel(
-                title = "Banjir",
-                icon = {
-                    Icon(imageVector = Icons.Default.Build, contentDescription = null)
-                }
-            ),
-            ChipModel(
-                title = "Banjir",
-                icon = {
-                    Icon(imageVector = Icons.Default.Build, contentDescription = null)
-                }
-            ),
-            ChipModel(
-                title = "Banjir",
-                icon = {
-                    Icon(imageVector = Icons.Default.Build, contentDescription = null)
-                }
-            ),
-            ChipModel(
-                title = "Banjir",
-                icon = {
-                    Icon(imageVector = Icons.Default.Build, contentDescription = null)
-                }
-            ),
-            ChipModel(
-                title = "Banjir",
-                icon = {
-                    Icon(imageVector = Icons.Default.Build, contentDescription = null)
-                }
-            ),
-            ChipModel(
-                title = "Banjir",
-                icon = {
-                    Icon(imageVector = Icons.Default.Build, contentDescription = null)
-                }
-            ),
-        )
+
         Text(
             text = "Filter :",
             style = MaterialTheme.typography.labelMedium.copy(

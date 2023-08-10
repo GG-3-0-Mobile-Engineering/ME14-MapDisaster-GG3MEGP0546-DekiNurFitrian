@@ -49,7 +49,6 @@ import com.example.finalprojectgg.domain.model.Report
 import com.example.finalprojectgg.domain.model.listReportDummy
 import com.google.android.gms.maps.model.LatLng
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
 fun DisasterItem(modifier: Modifier = Modifier, item: Report) {
     Column(
@@ -88,7 +87,11 @@ fun DisasterItem(modifier: Modifier = Modifier, item: Report) {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(imageVector = Icons.Default.ArrowCircleUp, contentDescription = null)
+                Icon(
+                    modifier = Modifier.size(24.dp),
+                    painter = painterResource(id = R.drawable.ic_pin_outlined),
+                    contentDescription = null
+                )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = "Jakarta, Indonesia",
@@ -114,7 +117,11 @@ fun DisasterItem(modifier: Modifier = Modifier, item: Report) {
             )
         }
 
-        ChipStatus(modifier = Modifier.padding(horizontal = 8.dp).padding(bottom = 8.dp))
+        ChipStatus(
+            modifier = Modifier
+                .padding(horizontal = 8.dp)
+                .padding(bottom = 8.dp)
+        )
     }
 }
 

@@ -11,7 +11,7 @@ import com.example.finalprojectgg.R
 sealed class Screens(
     val route: String,
     val title: String = "",
-    val icon: ImageVector =Icons.Default.Circle
+    val icon: ImageVector = Icons.Default.Circle
 ) {
     companion object {
         const val ROOT_ROUTE = "ROOT_ROUTE"

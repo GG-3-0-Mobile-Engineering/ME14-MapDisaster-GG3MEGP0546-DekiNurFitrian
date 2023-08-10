@@ -11,6 +11,6 @@ sealed class MapScreenEvent {
         val scrollState:LazyListState
     ) : MapScreenEvent()
 
-    object getReports:MapScreenEvent()
+    object GetReport:MapScreenEvent()
 
 }

@@ -25,26 +25,24 @@ fun AppNavGraph(
     navController: NavHostController
 ) {
     NavHost(navController = navController, startDestination = Screens.Splash.route) {
-
         composable(
             route = Screens.Splash.route
         ) {
             SplashScreen {
                 navController.navigate(Screens.ROOT_ROUTE)
             }
-
         }
 
         navigation(
             startDestination = Screens.MapDisaster.route,
             route = Screens.ROOT_ROUTE
         ) {
-
             composable(
                 route = Screens.MapDisaster.route
             ) {
                 MapDisasterScreen(paddingValues, viewModel)
             }
+
             composable(
                 route = Screens.MapDisasterSearch.route
             ) {
@@ -53,12 +51,12 @@ fun AppNavGraph(
                     viewModel = viewModel
                 )
             }
+
             composable(
                 route = Screens.Profile.route
             ) {
                 ProfileScreen(viewModel)
             }
-
         }
     }
 }

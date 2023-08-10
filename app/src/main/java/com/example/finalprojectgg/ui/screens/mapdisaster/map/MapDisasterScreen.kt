@@ -1,6 +1,5 @@
 package com.example.finalprojectgg.ui.screens.mapdisaster.map
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -40,16 +39,13 @@ fun MapDisasterScreen(
     paddingValues: PaddingValues,
     viewModel: MainViewModel
 ) {
+
     Box(
         modifier = Modifier
             .fillMaxSize()
     ) {
-        val chipState = viewModel.filterState
-        val chipStateFlow by viewModel.filterStateFlow.collectAsState()
-        Log.d("FILTER UI",chipStateFlow.hashCode().toString())
-
         LaunchedEffect(Unit) {
-            viewModel.onMapScreenEvent(MapScreenEvent.getReports)
+            viewModel.onMapScreenEvent(MapScreenEvent.GetReport)
         }
 
         Box(
@@ -67,9 +63,10 @@ fun MapDisasterScreen(
                 )
             )
 
-            MapDisasterFilterChip(chipStateFlow) {
+            MapDisasterFilterChip() {
                 viewModel.onChipChangedSec(it)
             }
+
             FullHeightBottomSheet(
                 swipeableState = swipeableState,
                 scrollState = scrollState

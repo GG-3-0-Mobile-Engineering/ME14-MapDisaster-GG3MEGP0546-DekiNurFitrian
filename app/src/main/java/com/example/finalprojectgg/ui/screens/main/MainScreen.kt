@@ -9,7 +9,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.TopAppBar
 import androidx.compose.material3.Icon
@@ -157,6 +159,8 @@ fun BottomBar(
     val currentDestination = navBackStackEntry?.destination
 
     NavigationBar(
+        modifier = Modifier.height(100.dp),
+        tonalElevation = 0.dp
     ) {
         screens.map {
             NavigationBarItem(
