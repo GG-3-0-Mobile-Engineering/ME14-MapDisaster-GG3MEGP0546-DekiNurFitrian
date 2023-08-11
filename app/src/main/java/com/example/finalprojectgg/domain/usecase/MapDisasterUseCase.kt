@@ -6,4 +6,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface MapDisasterUseCase {
     fun getReports():Flow<Resource<List<Report>>>
+
 }

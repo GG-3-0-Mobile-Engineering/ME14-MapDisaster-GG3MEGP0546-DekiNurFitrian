@@ -1,18 +1,12 @@
 package com.example.finalprojectgg.ui.viewmodel
 
-import android.util.Log
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.*
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.finalprojectgg.data.Resource
-import com.example.finalprojectgg.domain.model.ChipModel
-import com.example.finalprojectgg.domain.model.Report
-import com.example.finalprojectgg.domain.model.listDisaster
-import com.example.finalprojectgg.domain.model.listReportDummy
-import com.example.finalprojectgg.domain.usecase.MapDisasterUseCase
+import com.example.finalprojectgg.domain.repository.MapDisasterRepository
+import com.example.finalprojectgg.domain.usecase.MapDisasterUseCaseImpl
 import com.example.finalprojectgg.ui.navigation.Screens
 import com.example.finalprojectgg.ui.screens.main.MainScreenEvent
 import com.example.finalprojectgg.ui.screens.main.state.MainScreenViewState
@@ -22,92 +16,40 @@ import com.example.finalprojectgg.ui.screens.mapdisaster.map.state.MapScreenEven
 import com.example.finalprojectgg.ui.screens.mapdisaster.search.state.SearchDisasterScreenState
 import com.example.finalprojectgg.ui.screens.mapdisaster.map.state.MapState
 import com.example.finalprojectgg.ui.screens.profile.state.ProfileScreenEvent
+import com.example.finalprojectgg.ui.screens.state.FilterEvent
+import com.example.finalprojectgg.ui.screens.state.FilterState
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.maps.android.compose.MapProperties
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flatMapConcat
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.flow.updateAndGet
-import kotlinx.coroutines.launch
+import java.util.logging.Filter
 import javax.inject.Inject
-import kotlin.math.roundToInt
 
 @HiltViewModel
-class MainViewModel @Inject constructor(private val mapDisasterUseCase: MapDisasterUseCase) :
+class MainViewModel @Inject constructor(private val mapDisasterUseCase: MapDisasterUseCaseImpl,
+    private val repo:MapDisasterRepository) :
     ViewModel() {
-    val predicates = listOf(
-        { value: String -> value == "Banjir" },
-        { value: String -> value == "Gempabumi" },
-    )
     var mapScreenViewState = MutableStateFlow(MapState())
         private set
+
     var mainScreenViewState = MutableStateFlow(MainScreenViewState())
         private set
+
     var searchDisasterScreenViewState = MutableStateFlow(SearchDisasterScreenState())
         private set
+
     var themeState = mutableStateOf(false)
         private set
 
-    var list = mutableStateListOf<ChipModel>()
+   val filterState = mapDisasterUseCase.getFilterActive().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000),FilterState())
 
-    var filterState = mutableStateListOf<ChipModel>().apply {
-        addAll(listDisaster)
-    }
-        private set
-
-    var filterStateFlow = MutableStateFlow(listDisaster.toMutableList())
-        private set
-
-    init {
-        Log.d("DATA VM", "INIT")
-        collectFlow()
-    }
-
-
-    private fun collectFlow() {
-        viewModelScope.launch {
-            mapDisasterUseCase.getReports().collect { value ->
-                when (value) {
-                    is Resource.Loading -> {
-                        Log.d("DATA VM", "Loading")
-                        mapScreenViewState.update {
-                            it.copy(isProgress = true, isContent = false)
-                        }
-                    }
-
-                    is Resource.Success -> {
-                        Log.d("DATA VM", "Success")
-                        mapScreenViewState.update { mapState ->
-                            mapState.copy(
-                                data = value.data?.filter { report ->
-                                    predicates.all {
-                                        it(report.category)
-                                    }
-                                } ?: emptyList(),
-                                isProgress = false,
-                                isContent = true
-                            )
-                        }
-                    }
-
-                    is Resource.Error -> {
-                        Log.d("DATA VM", "Error")
-                    }
-                }
-            }
-        }
-    }
+    fun onFilterEvent(event: FilterEvent) = repo.updateFilterActive(event)
 
     @OptIn(ExperimentalMaterialApi::class, FlowPreview::class)
     fun onMapScreenEvent(event: MapScreenEvent) {
@@ -134,7 +76,7 @@ class MainViewModel @Inject constructor(private val mapDisasterUseCase: MapDisas
                 }
             }
 
-            is MapScreenEvent.getReports -> {
+            is MapScreenEvent.GetReport -> {
 
             }
         }
@@ -177,22 +119,6 @@ class MainViewModel @Inject constructor(private val mapDisasterUseCase: MapDisas
                 }
             }
         }
-    }
-
-    fun onChipChanged(index: Int) {
-        val item = filterState[index]
-        val selected = item.selected
-        filterState[index] = item.copy(selected = !selected)
-    }
-
-    fun onChipChangedSec(chip: ChipModel) {
-        val selected = filterStateFlow.value.contains(chip)
-        val newItem = filterStateFlow.value
-        if (selected) newItem.remove(chip) else newItem.add(chip)
-        filterStateFlow.value = newItem
-        
-
-        Log.d("Filter", filterStateFlow.value.hashCode().toString())
     }
 
 }

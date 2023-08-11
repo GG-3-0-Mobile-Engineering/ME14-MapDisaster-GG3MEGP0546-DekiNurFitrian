@@ -5,3 +5,4 @@ interface ScreenState {
     var isError:Boolean
     var isContent:Boolean
 }
+

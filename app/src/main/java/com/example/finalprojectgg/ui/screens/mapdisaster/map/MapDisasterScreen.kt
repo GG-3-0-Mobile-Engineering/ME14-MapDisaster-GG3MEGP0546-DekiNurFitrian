@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.finalprojectgg.domain.model.ChipModel
 import com.example.finalprojectgg.domain.model.listReportDummy
 import com.example.finalprojectgg.ui.screens.mapdisaster.components.DisasterItem
@@ -31,6 +32,7 @@ import com.example.finalprojectgg.ui.components.FullHeightBottomSheet
 import com.example.finalprojectgg.ui.components.States
 import com.example.finalprojectgg.ui.components.Test2FilterChipGroup
 import com.example.finalprojectgg.ui.screens.mapdisaster.map.state.MapScreenEvent
+import com.example.finalprojectgg.ui.screens.state.FilterEvent
 import com.example.finalprojectgg.ui.viewmodel.MainViewModel
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -39,6 +41,7 @@ fun MapDisasterScreen(
     paddingValues: PaddingValues,
     viewModel: MainViewModel
 ) {
+    val filterState by viewModel.filterState.collectAsStateWithLifecycle()
 
     Box(
         modifier = Modifier
@@ -47,7 +50,6 @@ fun MapDisasterScreen(
         LaunchedEffect(Unit) {
             viewModel.onMapScreenEvent(MapScreenEvent.GetReport)
         }
-
         Box(
             Modifier
                 .fillMaxSize()
@@ -63,8 +65,8 @@ fun MapDisasterScreen(
                 )
             )
 
-            MapDisasterFilterChip() {
-                viewModel.onChipChangedSec(it)
+            MapDisasterFilterChip(filterState.disasterFilter){
+                viewModel.onFilterEvent(FilterEvent.OnDisasterChanged(it))
             }
 
             FullHeightBottomSheet(
@@ -123,7 +125,5 @@ fun MapDisasterFilterChip(
     chipState: List<ChipModel>,
     onItemChipClick: (ChipModel) -> Unit,
 ) {
-//    FilterChipGroup(chipState = chipState)
-//    TestFilterChipGroup(chipState = chipState, onItemChipClick = onItemChipClick)
     Test2FilterChipGroup(chipState = chipState, onItemChipClick = onItemChipClick)
 }

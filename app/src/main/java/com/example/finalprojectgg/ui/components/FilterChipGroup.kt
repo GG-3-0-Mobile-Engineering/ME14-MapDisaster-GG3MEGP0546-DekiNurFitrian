@@ -2,6 +2,7 @@ package com.example.finalprojectgg.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -18,6 +19,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 
@@ -112,12 +115,13 @@ fun Test2FilterChipGroup(
     ) {
         itemsIndexed(items = chipState, key = { index, item -> item.title }) { index, item ->
             FilterChip(
-                selected = chipState.contains(item),
+                selected = item.selected,
                 onClick = { onItemChipClick(item) },
                 selectedIcon = {
                     Icon(
-                        imageVector = Icons.Default.Build,
-                        contentDescription = null
+                        painter = painterResource(id = item.icon),
+                        contentDescription = null,
+                        modifier = Modifier.size(24.dp)
                     )
                 },
                 colors = ChipDefaults.filterChipColors(
