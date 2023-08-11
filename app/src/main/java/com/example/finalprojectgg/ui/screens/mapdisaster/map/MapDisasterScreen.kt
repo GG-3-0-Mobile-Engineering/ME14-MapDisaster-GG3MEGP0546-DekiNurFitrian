@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.rememberSwipeableState
@@ -41,6 +42,7 @@ fun MapDisasterScreen(
     paddingValues: PaddingValues,
     viewModel: MainViewModel
 ) {
+    val mapState by viewModel.mapScreenViewState.collectAsStateWithLifecycle()
     val filterState by viewModel.filterState.collectAsStateWithLifecycle()
 
     Box(
@@ -65,7 +67,7 @@ fun MapDisasterScreen(
                 )
             )
 
-            MapDisasterFilterChip(filterState.disasterFilter){
+            MapDisasterFilterChip(filterState.disasterFilter) {
                 viewModel.onFilterEvent(FilterEvent.OnDisasterChanged(it))
             }
 
@@ -105,13 +107,12 @@ fun MapDisasterScreen(
                         }
                     }
                 }
-
-                items(4) {
+                items(items = mapState.reports, key = { it.id }) {item ->
                     Box(
                         modifier = Modifier
                             .padding(horizontal = 16.dp)
                     ) {
-                        DisasterItem(item = listReportDummy[0] )
+                        DisasterItem(item = item)
                     }
                 }
             }

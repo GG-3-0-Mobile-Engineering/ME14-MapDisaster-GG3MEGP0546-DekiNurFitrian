@@ -42,26 +42,6 @@ class MapDisasterUseCaseImpl @Inject constructor(
         filterState.copy(disasterFilter = disasterFilter,provinceFilter = provinceFilter, timePeriodFilter = timePeriodFilter)
     }
 
-    override fun getReports(): Flow<Resource<List<Report>>> = flow {
-        emit(Resource.Loading())
-        delay(2000)
-        emit(
-            Resource.Success(
-                listReportDummy
-            )
-        )
-        delay(500)
-        emit(Resource.Error(""))
-    }
+    override fun getReports(): Flow<Resource<List<Report>>> = repo.getReports()
 
-    fun getReportByFilter(filter: String): Flow<Resource<List<Report>>> = flow {
-        emit(Resource.Loading())
-        try {
-            emit(Resource.Success(listReportDummy.filter {
-                it.category == filter
-            }))
-        } catch (e: Exception) {
-            emit(Resource.Error(message = e.toString()))
-        }
-    }
 }

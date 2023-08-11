@@ -3,6 +3,7 @@ package com.example.finalprojectgg.domain.model
 import com.google.android.gms.maps.model.LatLng
 
 data class Report(
+    var id: String = "",
     var title:String,
     var desc:String,
     var date:String,

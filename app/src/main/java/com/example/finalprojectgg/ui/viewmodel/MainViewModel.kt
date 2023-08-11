@@ -1,10 +1,12 @@
 package com.example.finalprojectgg.ui.viewmodel
 
+import android.util.Log
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.*
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.finalprojectgg.data.Resource
 import com.example.finalprojectgg.domain.repository.MapDisasterRepository
 import com.example.finalprojectgg.domain.usecase.MapDisasterUseCaseImpl
 import com.example.finalprojectgg.ui.navigation.Screens
@@ -24,16 +26,20 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import java.util.logging.Filter
 import javax.inject.Inject
 
 @HiltViewModel
-class MainViewModel @Inject constructor(private val mapDisasterUseCase: MapDisasterUseCaseImpl,
-    private val repo:MapDisasterRepository) :
+class MainViewModel @Inject constructor(
+    private val mapDisasterUseCase: MapDisasterUseCaseImpl,
+    private val repo: MapDisasterRepository
+) :
     ViewModel() {
     var mapScreenViewState = MutableStateFlow(MapState())
         private set
@@ -47,9 +53,27 @@ class MainViewModel @Inject constructor(private val mapDisasterUseCase: MapDisas
     var themeState = mutableStateOf(false)
         private set
 
-   val filterState = mapDisasterUseCase.getFilterActive().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000),FilterState())
+    val filterState = mapDisasterUseCase.getFilterActive()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), FilterState())
 
     fun onFilterEvent(event: FilterEvent) = repo.updateFilterActive(event)
+
+    init {
+        viewModelScope.launch {
+            mapDisasterUseCase.getReports().collect{
+                when (it) {
+                    is Resource.Success -> {
+                        mapScreenViewState.update { state ->
+                            state.copy(reports = it.data)
+                        }
+                    }
+                    else -> {
+                        Log.d("Report","Error")
+                    }
+                }
+            }
+        }
+    }
 
     @OptIn(ExperimentalMaterialApi::class, FlowPreview::class)
     fun onMapScreenEvent(event: MapScreenEvent) {
@@ -120,5 +144,4 @@ class MainViewModel @Inject constructor(private val mapDisasterUseCase: MapDisas
             }
         }
     }
-
 }

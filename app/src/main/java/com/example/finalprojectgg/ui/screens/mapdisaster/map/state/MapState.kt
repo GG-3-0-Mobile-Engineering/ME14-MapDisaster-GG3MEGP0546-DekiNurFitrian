@@ -10,8 +10,7 @@ data class MapState(
     override var isProgress: Boolean = true,
     override var isError: Boolean = false,
     override var isContent: Boolean = false,
-
-    var data: List<Report> = listOf(),
+    var reports: List<Report> = listOf(),
     var properties: MapProperties = MapProperties(
         mapStyleOptions = MapStyleOptions(MapStyle.darkMapStyle),
     )

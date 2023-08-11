@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 data class GeometriesItem(
 
 	@field:SerializedName("coordinates")
-	val coordinates: List<Any?>? = null,
+	val coordinates: List<Double>? = null,
 
 	@field:SerializedName("type")
 	val type: String? = null,

@@ -18,7 +18,7 @@ class RemoteDataSource @Inject constructor(private val apiService: PetaBencanaAp
     suspend fun getReports(): Flow<ApiResponse<List<GeometriesItem?>>> {
         return flow {
             try {
-                val response = apiService.getReports()
+                val response = apiService.getReports(timePeriod = 604800)
                 val dataArray = response.result?.objects?.output?.geometries
 
                 dataArray?.let {

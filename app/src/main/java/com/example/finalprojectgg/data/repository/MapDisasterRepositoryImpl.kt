@@ -10,6 +10,7 @@ import com.example.finalprojectgg.domain.model.Report
 import com.example.finalprojectgg.domain.repository.MapDisasterRepository
 import com.example.finalprojectgg.ui.screens.state.FilterEvent
 import com.example.finalprojectgg.ui.screens.state.FilterState
+import com.example.finalprojectgg.utils.Utils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -27,23 +28,26 @@ class MapDisasterRepositoryImpl @Inject constructor(
 ) : MapDisasterRepository {
 
     private val filterActive = mutableStateOf(FilterActive())
-    private val _filterActiveFlow = MutableSharedFlow<FilterActive>(replay = 1, extraBufferCapacity = 1)
+    private val _filterActiveFlow =
+        MutableSharedFlow<FilterActive>(replay = 1, extraBufferCapacity = 1)
+
     override fun getReports(): Flow<Resource<List<Report>>> {
         return flow {
             emit(Resource.Loading())
             remoteDataSource.getReports().collect { apiResponse ->
                 when (apiResponse) {
                     is ApiResponse.Success -> {
-                        Log.d("Remote", "Success Connect")
-                        Log.d("Remote", apiResponse.data.size.toString())
+                        emit(Resource.Success(apiResponse.data.map { responseItem ->
+                            Utils.DataMapper.reportApiToReportModel(responseItem)
+                        }))
                     }
 
                     is ApiResponse.Empty -> {
-
+                        emit(Resource.Empty())
                     }
 
                     is ApiResponse.Error -> {
-
+                        emit(Resource.Error(apiResponse.error.message.toString()))
                     }
                 }
             }
