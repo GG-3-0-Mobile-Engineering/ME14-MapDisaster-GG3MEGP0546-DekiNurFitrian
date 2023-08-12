@@ -18,10 +18,10 @@ class DatabaseModule {
     @Provides
     fun provideDatabase(@ApplicationContext context: Context): DisasterDatabase = Room.databaseBuilder(
         context,
-        DisasterDatabase::class.java, "game.db"
+        DisasterDatabase::class.java, "disaster.db"
     ).fallbackToDestructiveMigration()
         .build()
 
     @Provides
-    fun provideGameDao(database: DisasterDatabase): DisasterDao = database.disasterDao()
+    fun provideDatabaseDao(database: DisasterDatabase): DisasterDao = database.disasterDao()
 }

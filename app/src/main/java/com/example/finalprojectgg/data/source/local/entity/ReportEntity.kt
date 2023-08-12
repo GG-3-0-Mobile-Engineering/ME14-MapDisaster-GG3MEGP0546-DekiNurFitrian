@@ -5,7 +5,7 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "reports")
 data class ReportEntity(
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
     val id:Int,
     var title:String?,
     var desc:String?,
@@ -13,7 +13,7 @@ data class ReportEntity(
     var status:String?,
     var imgUrl:String?,
     var category: String?,
-    val latitude:Long?,
-    val longitude:Long?,
+    val latitude:Double?,
+    val longitude:Double?,
     var province:String?
 )

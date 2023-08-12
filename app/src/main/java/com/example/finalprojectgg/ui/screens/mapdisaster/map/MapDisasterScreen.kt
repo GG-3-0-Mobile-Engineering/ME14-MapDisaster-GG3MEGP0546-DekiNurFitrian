@@ -27,7 +27,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.finalprojectgg.domain.model.ChipModel
-import com.example.finalprojectgg.domain.model.listReportDummy
 import com.example.finalprojectgg.ui.screens.mapdisaster.components.DisasterItem
 import com.example.finalprojectgg.ui.components.FullHeightBottomSheet
 import com.example.finalprojectgg.ui.components.States
@@ -107,7 +106,7 @@ fun MapDisasterScreen(
                         }
                     }
                 }
-                items(items = mapState.reports, key = { it.id }) {item ->
+                items(items = mapState.reportModels, key = { it.id }) { item ->
                     Box(
                         modifier = Modifier
                             .padding(horizontal = 16.dp)

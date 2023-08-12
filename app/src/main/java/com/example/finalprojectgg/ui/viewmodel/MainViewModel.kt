@@ -26,13 +26,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.util.logging.Filter
 import javax.inject.Inject
 
 @HiltViewModel
@@ -64,7 +60,7 @@ class MainViewModel @Inject constructor(
                 when (it) {
                     is Resource.Success -> {
                         mapScreenViewState.update { state ->
-                            state.copy(reports = it.data)
+                            state.copy(reportModels = it.data)
                         }
                     }
                     else -> {

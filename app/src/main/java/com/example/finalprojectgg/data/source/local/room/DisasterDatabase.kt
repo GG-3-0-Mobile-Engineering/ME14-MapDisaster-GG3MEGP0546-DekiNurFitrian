@@ -5,7 +5,6 @@ import androidx.room.RoomDatabase
 import com.example.finalprojectgg.data.source.local.entity.ReportEntity
 import javax.inject.Singleton
 
-@Singleton
 @Database(
     entities = [ReportEntity::class],
     version = 1,
