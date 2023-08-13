@@ -26,7 +26,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.finalprojectgg.domain.model.ChipModel
+import com.example.finalprojectgg.domain.model.FilterDisasterModel
 import com.example.finalprojectgg.ui.screens.mapdisaster.components.DisasterItem
 import com.example.finalprojectgg.ui.components.FullHeightBottomSheet
 import com.example.finalprojectgg.ui.components.States
@@ -122,8 +122,8 @@ fun MapDisasterScreen(
 
 @Composable
 fun MapDisasterFilterChip(
-    chipState: List<ChipModel>,
-    onItemChipClick: (ChipModel) -> Unit,
+    chipState: List<FilterDisasterModel>,
+    onItemChipClick: (FilterDisasterModel) -> Unit,
 ) {
     Test2FilterChipGroup(chipState = chipState, onItemChipClick = onItemChipClick)
 }

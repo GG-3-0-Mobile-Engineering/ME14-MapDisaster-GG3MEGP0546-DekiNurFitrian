@@ -10,7 +10,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 
 interface MapDisasterRepository {
-    fun getReports(): Flow<Resource<List<ReportModel>>>
+    fun getReports(filterQuery:FilterActive): Flow<Resource<List<ReportModel>>>
+    fun getReportsArchive(filterQuery: FilterActive):Flow<Resource<List<ReportModel>>>
     fun getFilterActive():SharedFlow<FilterActive>
     fun getFilter():MutableStateFlow<FilterState>
     fun updateFilterActive(event: FilterEvent)

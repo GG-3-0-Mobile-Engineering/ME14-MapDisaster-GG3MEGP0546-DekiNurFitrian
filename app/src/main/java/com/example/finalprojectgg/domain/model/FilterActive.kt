@@ -7,5 +7,5 @@ import com.example.finalprojectgg.ui.screens.state.TimePeriod
 data class FilterActive(
     val filterByDisaster: SnapshotStateList<String> = mutableStateListOf(),
     val filterByProvince: SnapshotStateList<String> = mutableStateListOf(),
-    val filterByTimePeriod: TimePeriod = TimePeriod("","")
+    var filterByTimePeriod: TimePeriod? = null
 )

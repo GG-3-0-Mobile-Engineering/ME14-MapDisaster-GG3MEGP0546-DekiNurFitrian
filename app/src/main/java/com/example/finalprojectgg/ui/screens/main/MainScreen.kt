@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.TopAppBar
 import androidx.compose.material3.Icon
@@ -61,6 +60,7 @@ fun MainScreen(
     }
 
     val mainScreenViewState by viewModel.mainScreenViewState.collectAsStateWithLifecycle()
+    val mapState by viewModel.mapScreenViewState.collectAsStateWithLifecycle()
 
     when (currentDestination) {
         Screens.MapDisaster.route -> {
@@ -134,14 +134,14 @@ fun MainScreen(
         Box(
             modifier = modifier.then(
                 if (bottomBarState) {
-                    Modifier.fillMaxSize().padding(bottom = it.calculateBottomPadding())
+                    Modifier
+                        .fillMaxSize()
+                        .padding(bottom = it.calculateBottomPadding())
                 } else {
                     Modifier.fillMaxSize()
                 }
             )
         ) {
-            val mapState by viewModel.mapScreenViewState.collectAsStateWithLifecycle()
-
             MapView(mapState = mapState)
             AppNavGraph(paddingValues = it, navController = navController, viewModel = viewModel)
         }

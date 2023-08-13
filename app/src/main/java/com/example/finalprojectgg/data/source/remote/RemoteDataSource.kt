@@ -37,4 +37,30 @@ class RemoteDataSource @Inject constructor(private val apiService: PetaBencanaAp
             }
         }.flowOn(Dispatchers.IO)
     }
+
+    suspend fun getReportsArchive(
+        start: String,
+        end: String
+    ): Flow<ApiResponse<List<GeometriesItem?>>> {
+        return flow {
+            try {
+                val response = apiService.getReportsArchive(start = "2023-01-04T00:00:00+0700",end = "2023-02-10T00:00:00+0700")
+                val dataArray = response.result?.objects?.output?.geometries
+
+                dataArray?.let {
+                    if (dataArray.isNotEmpty()) {
+                        emit(ApiResponse.Success(response.result.objects.output.geometries))
+                    } else {
+                        emit(ApiResponse.Empty)
+                    }
+                }
+            } catch (e: HttpException) {
+                emit(ApiResponse.Error(e))
+                Log.e("Remote Data Source", e.toString())
+            } catch (e: IOException) {
+                emit(ApiResponse.Error(e))
+                Log.e("Remote Data Source", "Check Connection")
+            }
+        }.flowOn(Dispatchers.IO)
+    }
 }

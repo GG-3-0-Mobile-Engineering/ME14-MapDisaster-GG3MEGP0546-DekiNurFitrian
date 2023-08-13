@@ -3,13 +3,13 @@ package com.example.finalprojectgg.ui.screens.mapdisaster.search
 import android.os.Build
 import android.util.Range
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,22 +18,21 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.Chip
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.rememberModalBottomSheetState
+import androidx.compose.material3.AssistChip
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ShapeDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -45,10 +44,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.util.toRange
-import com.example.finalprojectgg.domain.model.ChipModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.finalprojectgg.domain.model.FilterDisasterModel
+import com.example.finalprojectgg.domain.model.FilterProvinceModel
 import com.example.finalprojectgg.domain.model.listDisaster
 import com.example.finalprojectgg.domain.model.listProvince
 import com.example.finalprojectgg.ui.components.FlowRow
+import com.example.finalprojectgg.ui.screens.state.FilterEvent
+import com.example.finalprojectgg.ui.screens.state.FilterState
+import com.example.finalprojectgg.ui.screens.state.TimePeriod
 import com.example.finalprojectgg.ui.viewmodel.MainViewModel
 import com.maxkeppeker.sheets.core.models.base.rememberUseCaseState
 import com.maxkeppeler.sheets.calendar.CalendarDialog
@@ -59,6 +63,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
@@ -67,10 +72,12 @@ fun SearchDisasterScreen(
     modifier: Modifier = Modifier,
     viewModel: MainViewModel
 ) {
-    val sheetStateFilter = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
+    val sheetStateFilter =
+        rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
     var isTransitionAnimation by remember { mutableStateOf(true) }
     val scope = rememberCoroutineScope()
     val searchDisasterScreenState = viewModel.searchDisasterScreenViewState
+    val filterState by viewModel.filterState.collectAsStateWithLifecycle()
 
     Box(
         modifier = modifier
@@ -91,7 +98,15 @@ fun SearchDisasterScreen(
             }
         }
         Column {
-            FilterSearchDisasterChipActive()
+            FilterActiveBar(
+                filterState = filterState,
+                onRemoveDisasterFilter = { viewModel.onFilterEvent(FilterEvent.OnDisasterChanged(it)) },
+                onRemoveProvinceFilter = { viewModel.onFilterEvent(FilterEvent.OnProvinceChanged(it)) },
+                onRemoveTimePeriodFilter = {
+                    viewModel.onFilterEvent(
+                        FilterEvent.OnTimePeriodChanged(null)
+                    )
+                })
             SearchDisasterListView()
         }
 
@@ -100,8 +115,10 @@ fun SearchDisasterScreen(
             sheetBackgroundColor = MaterialTheme.colorScheme.surface,
             sheetContentColor = MaterialTheme.colorScheme.onSurface,
             sheetContent = {
-            FilterSheet()
-        }) {
+                FilterSheet(filterState.timePeriodFilter, onFilterTimePeriodChanged = {
+                    viewModel.onFilterEvent(FilterEvent.OnTimePeriodChanged(it))
+                })
+            }) {
 
         }
     }
@@ -113,25 +130,24 @@ fun SearchDisasterScreen(
     ExperimentalMaterial3Api::class
 )
 @Composable
-fun FilterSheet() {
+fun FilterSheet(
+    filterTimePeriod: TimePeriod?,
+    onFilterTimePeriodChanged: (TimePeriod) -> Unit
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()
     ) {
         val calendarState = rememberUseCaseState()
         val timeBoundary = LocalDate.now().let { now -> now.minusYears(2)..now }
-        val selectedRange = remember {
-            val default =
-                LocalDate.now().minusYears(2).let { time -> time.plusDays(5)..time.plusDays(8) }
-            mutableStateOf(default.toRange())
-        }
+        val selectedRange = filterTimePeriod?.getRangeTime()
 
         CalendarDialog(
             state = calendarState,
             selection = CalendarSelection.Period(
-                selectedRange = selectedRange.value
+                selectedRange = selectedRange
             ) { startDate, endDate ->
-                selectedRange.value = Range(startDate, endDate)
+                onFilterTimePeriodChanged(TimePeriod(startDate, endDate))
             },
             config = CalendarConfig(
                 yearSelection = true,
@@ -194,7 +210,10 @@ fun FilterSheet() {
                             },
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(text = "Awal Waktu")
+                        Text(
+                            text = filterTimePeriod?.startTime?.format(DateTimeFormatter.ISO_DATE)
+                                ?: "Start Date"
+                        )
                     }
 
                     Spacer(modifier = Modifier.width(16.dp))
@@ -214,7 +233,10 @@ fun FilterSheet() {
                             },
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(text = "Akhir Waktu")
+                        Text(
+                            text = filterTimePeriod?.endTime?.format(DateTimeFormatter.ISO_DATE)
+                                ?: "End Date"
+                        )
                     }
                 }
             }
@@ -253,7 +275,7 @@ fun FilterSheet() {
                     repeat(listProvince.size) {
                         val item = listProvince[it]
                         Chip(modifier = Modifier.padding(end = 8.dp), onClick = { /*TODO*/ }) {
-                            Text(text = item.title)
+                            Text(text = item.name)
                         }
                     }
                 }
@@ -263,9 +285,13 @@ fun FilterSheet() {
     }
 }
 
-@Preview(showBackground = true)
 @Composable
-fun FilterSearchDisasterChipActive() {
+fun FilterActiveBar(
+    filterState: FilterState,
+    onRemoveDisasterFilter: (FilterDisasterModel) -> Unit,
+    onRemoveProvinceFilter: (FilterProvinceModel) -> Unit,
+    onRemoveTimePeriodFilter: () -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -273,10 +299,6 @@ fun FilterSearchDisasterChipActive() {
             .height(50.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        val selectedChipItem = remember {
-            mutableStateListOf<ChipModel>()
-        }
-
         Text(
             text = "Filter :",
             style = MaterialTheme.typography.labelMedium.copy(
@@ -284,7 +306,47 @@ fun FilterSearchDisasterChipActive() {
                 color = MaterialTheme.colorScheme.onSurface
             )
         )
-//        FilterChipGroup(chipItems = filterBencana, selectedItem = selectedChipItem)
+        FilterActiveChip(
+            filterState = filterState,
+            onRemoveDisasterFilter = onRemoveDisasterFilter,
+            onRemoveProvinceFilter = onRemoveProvinceFilter,
+            onRemoveTimePeriodFilter = onRemoveTimePeriodFilter
+        )
+    }
+}
+
+@Composable
+fun FilterActiveChip(
+    filterState: FilterState,
+    onRemoveDisasterFilter: (FilterDisasterModel) -> Unit,
+    onRemoveProvinceFilter: (FilterProvinceModel) -> Unit,
+    onRemoveTimePeriodFilter: () -> Unit
+) {
+    LazyRow(
+        userScrollEnabled = true,
+        contentPadding = PaddingValues(horizontal = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        val disasterActive = filterState.disasterFilter.filter { it.selected }
+        val provinceActive = filterState.provinceFilter.filter { it.isActive }
+
+        itemsIndexed(items = disasterActive, key = { _, item -> item.title }) { index, item ->
+            AssistChip(
+                onClick = { onRemoveDisasterFilter(item) },
+                label = { Text(text = item.title) })
+        }
+        itemsIndexed(items = provinceActive, key = { _, item -> item.id }) { index, item ->
+            AssistChip(
+                onClick = { onRemoveProvinceFilter(item) },
+                label = { Text(text = item.name) })
+        }
+        if (filterState.timePeriodFilter != null) {
+            item {
+                AssistChip(
+                    onClick = { onRemoveTimePeriodFilter() },
+                    label = { Text(text = "Filter By Time") })
+            }
+        }
     }
 }
 

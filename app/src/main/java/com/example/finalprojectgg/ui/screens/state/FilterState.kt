@@ -1,18 +1,28 @@
 package com.example.finalprojectgg.ui.screens.state
 
-import androidx.compose.runtime.snapshots.SnapshotStateList
-import com.example.finalprojectgg.domain.model.ChipModel
+import android.os.Build
+import android.util.Range
+import androidx.annotation.RequiresApi
+import com.example.finalprojectgg.domain.model.FilterDisasterModel
 import com.example.finalprojectgg.domain.model.FilterProvinceModel
 import com.example.finalprojectgg.domain.model.listDisaster
-import com.example.finalprojectgg.domain.model.listFilterProvince
+import com.example.finalprojectgg.domain.model.listProvince
+import java.time.LocalDate
 
 data class FilterState(
-    var disasterFilter: List<ChipModel> = listDisaster,
-    var timePeriodFilter:TimePeriod = TimePeriod("",""),
-    var provinceFilter: List<FilterProvinceModel> = listFilterProvince
+    var disasterFilter: List<FilterDisasterModel> = listDisaster,
+    var timePeriodFilter:TimePeriod? = null,
+    var provinceFilter: List<FilterProvinceModel> = listProvince
 )
 
 data class TimePeriod(
-    var startTime:String,
-    var endTime:String
-)
+    var startTime:LocalDate,
+    var endTime:LocalDate
+){
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun getRangeTime():Range<LocalDate>{
+        return Range(startTime,endTime)
+    }
+}
+
+

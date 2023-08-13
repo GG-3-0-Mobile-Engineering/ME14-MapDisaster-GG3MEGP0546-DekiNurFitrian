@@ -26,6 +26,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -37,34 +38,32 @@ class MainViewModel @Inject constructor(
     private val repo: MapDisasterRepository
 ) :
     ViewModel() {
-    var mapScreenViewState = MutableStateFlow(MapState())
-        private set
+    val mapScreenViewState = MutableStateFlow(MapState())
 
-    var mainScreenViewState = MutableStateFlow(MainScreenViewState())
-        private set
+    val mainScreenViewState = MutableStateFlow(MainScreenViewState())
 
-    var searchDisasterScreenViewState = MutableStateFlow(SearchDisasterScreenState())
-        private set
+    val searchDisasterScreenViewState = MutableStateFlow(SearchDisasterScreenState())
 
-    var themeState = mutableStateOf(false)
-        private set
+    val themeState = mutableStateOf(false)
 
     val filterState = mapDisasterUseCase.getFilterActive()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), FilterState())
 
     fun onFilterEvent(event: FilterEvent) = repo.updateFilterActive(event)
 
+
     init {
         viewModelScope.launch {
-            mapDisasterUseCase.getReports().collect{
+            mapDisasterUseCase.getReports().collectLatest {
                 when (it) {
                     is Resource.Success -> {
                         mapScreenViewState.update { state ->
                             state.copy(reportModels = it.data)
                         }
                     }
+
                     else -> {
-                        Log.d("Report","Error")
+                        Log.d("Report", "Error")
                     }
                 }
             }

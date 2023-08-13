@@ -8,7 +8,7 @@ data class FilterProvinceModel(
     var isActive:Boolean = false
 )
 
-val listFilterProvince = mutableStateListOf(
+val listProvince = mutableStateListOf(
     FilterProvinceModel(
         id = "ID-AC",
         name = "Aceh"

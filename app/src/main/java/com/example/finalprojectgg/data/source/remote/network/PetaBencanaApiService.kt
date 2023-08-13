@@ -16,6 +16,14 @@ interface PetaBencanaApiService {
         @Query("timeperiod") timePeriod: Int? = null,
     ): ReportsResponse
 
+    @GET("reports/archive")
+    suspend fun getReportsArchive(
+        @Query("start") start: String,
+        @Query("end") end: String,
+        @Query("city") city: String? = null,
+        @Query("geoformat") geoFormat: String? = null,
+    ): ReportsResponse
+
     @GET("floods")
     suspend fun getFloods(
         @Query("admin") admin: String,

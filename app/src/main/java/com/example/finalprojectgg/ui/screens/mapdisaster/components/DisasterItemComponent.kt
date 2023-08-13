@@ -58,7 +58,9 @@ fun DisasterItem(modifier: Modifier = Modifier, item: ReportModel) {
                     .fillMaxSize()
                     .clip(MaterialTheme.shapes.medium)
             )
-            ChipStatus(modifier = Modifier.graphicsLayer {
+            ChipStatus(
+                text = item.status,
+                modifier = Modifier.graphicsLayer {
                 translationY = 20f
                 translationX = 20f
             })
@@ -102,6 +104,7 @@ fun DisasterItem(modifier: Modifier = Modifier, item: ReportModel) {
         }
 
         ChipStatus(
+            text = item.category,
             modifier = Modifier
                 .padding(horizontal = 8.dp)
                 .padding(bottom = 8.dp)

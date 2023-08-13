@@ -2,6 +2,7 @@ package com.example.finalprojectgg.utils
 
 import com.example.finalprojectgg.data.source.local.entity.ReportEntity
 import com.example.finalprojectgg.data.source.remote.response.GeometriesItem
+import com.example.finalprojectgg.domain.model.FilterActive
 import com.example.finalprojectgg.domain.model.ReportModel
 import com.google.android.gms.maps.model.LatLng
 
@@ -25,7 +26,7 @@ class Utils {
             )
         }
 
-        fun reportApiToReportEntity(data:GeometriesItem?):ReportEntity{
+        fun reportApiToReportEntity(data: GeometriesItem?): ReportEntity {
             val properties = data?.properties
             val coordinates = data?.coordinates
             return ReportEntity(
@@ -36,13 +37,13 @@ class Utils {
                 status = properties?.status ?: "",
                 imgUrl = properties?.imageUrl ?: "",
                 category = properties?.disasterType ?: "",
-                latitude = coordinates?.get(0) ?: 0.0,
-                longitude = coordinates?.get(1) ?: 0.0,
+                latitude = coordinates?.get(1) ?: 0.0,
+                longitude = coordinates?.get(0) ?: 0.0,
                 province = properties?.tags?.regionCode ?: ""
             )
         }
 
-        fun reportEntityToReportModel(data:ReportEntity):ReportModel{
+        fun reportEntityToReportModel(data: ReportEntity): ReportModel {
             return ReportModel(
                 id = data.id,
                 title = data.title ?: "No Title",
@@ -51,9 +52,57 @@ class Utils {
                 status = data.status ?: "",
                 imgUrl = data.imgUrl ?: "",
                 category = data.category ?: "",
-                latLng = LatLng(data.latitude ?: 0.0,data.longitude ?: 0.0),
+                latLng = LatLng(data.latitude ?: 0.0, data.longitude ?: 0.0),
                 province = data.province ?: ""
             )
         }
+    }
+
+    object Filter {
+        fun recentReport(filterActive: FilterActive, data: List<ReportModel>): List<ReportModel> {
+            val filterDisaster = filterActive.filterByDisaster.isNotEmpty()
+            val filterProvince = filterActive.filterByProvince.isNotEmpty()
+            return if (filterDisaster && filterProvince) {
+                val temp = mutableListOf<ReportModel>()
+                temp.addAll(filterByDisaster(filterActive.filterByDisaster, data))
+                temp.addAll(filterByProvince(filterActive.filterByProvince, temp))
+                temp.sortedByDescending {
+                    it.id
+                }
+            } else if (filterDisaster) {
+                filterByDisaster(filterActive.filterByDisaster, data)
+            } else if (filterProvince) {
+                filterByProvince(filterActive.filterByProvince, data)
+            } else data
+        }
+
+        private fun filterByDisaster(
+            queries: List<String>,
+            data: List<ReportModel>
+        ): List<ReportModel> {
+            val temp = mutableListOf<ReportModel>()
+            queries.forEach { query ->
+                temp.addAll(data.filter {
+                    it.category == query
+                })
+            }
+            return temp.sortedByDescending {
+                it.id
+            }
+        }
+
+        private fun filterByProvince(
+            queries: List<String>,
+            data: List<ReportModel>
+        ): List<ReportModel> {
+            val temp = mutableListOf<ReportModel>()
+            queries.forEach { query ->
+                temp.addAll(data.filter {
+                    it.province == query
+                })
+            }
+            return temp.sortedByDescending { it.id }
+        }
+
     }
 }

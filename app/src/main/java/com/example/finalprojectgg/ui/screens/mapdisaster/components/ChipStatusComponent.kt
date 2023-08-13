@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun ChipStatus(
     modifier: Modifier = Modifier,
-    text: String = "Banjir",
+    text: String,
     color: Color = MaterialTheme.colorScheme.errorContainer
 ) {
     Row(

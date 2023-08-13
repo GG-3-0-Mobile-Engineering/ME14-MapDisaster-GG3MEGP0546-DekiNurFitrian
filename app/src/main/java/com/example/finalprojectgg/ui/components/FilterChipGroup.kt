@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.ChipDefaults
 import androidx.compose.material.ExperimentalMaterialApi
@@ -15,24 +14,19 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.*
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 
-import com.example.finalprojectgg.domain.model.ChipModel
-import com.example.finalprojectgg.domain.model.listDisaster
+import com.example.finalprojectgg.domain.model.FilterDisasterModel
 import com.example.finalprojectgg.ui.viewmodel.MainViewModel
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun FilterChipGroup(
-    chipState: List<ChipModel>,
-    viewModel: MainViewModel = hiltViewModel()
+    chipState: List<FilterDisasterModel>
 ) {
     LazyRow(
         userScrollEnabled = true,
@@ -43,7 +37,7 @@ fun FilterChipGroup(
             FilterChip(
                 selected = item.selected,
                 onClick = {
-//                    viewModel.update(index)
+                          
                 },
                 selectedIcon = {
                     Icon(
@@ -69,7 +63,7 @@ fun FilterChipGroup(
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun TestFilterChipGroup(
-    chipState: List<ChipModel>,
+    chipState: List<FilterDisasterModel>,
     onItemChipClick: (Int) -> Unit
 ) {
     LazyRow(
@@ -105,8 +99,8 @@ fun TestFilterChipGroup(
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun Test2FilterChipGroup(
-    chipState: List<ChipModel>,
-    onItemChipClick: (ChipModel) -> Unit
+    chipState: List<FilterDisasterModel>,
+    onItemChipClick: (FilterDisasterModel) -> Unit
 ) {
     LazyRow(
         userScrollEnabled = true,
