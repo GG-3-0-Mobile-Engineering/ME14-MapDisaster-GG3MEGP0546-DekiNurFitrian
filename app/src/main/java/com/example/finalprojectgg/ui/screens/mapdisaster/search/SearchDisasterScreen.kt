@@ -1,7 +1,6 @@
 package com.example.finalprojectgg.ui.screens.mapdisaster.search
 
 import android.os.Build
-import android.util.Range
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -19,6 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.Chip
 import androidx.compose.material.ExperimentalMaterialApi
@@ -29,6 +29,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.ShapeDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -41,15 +42,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.util.toRange
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.finalprojectgg.domain.model.FilterDisasterModel
 import com.example.finalprojectgg.domain.model.FilterProvinceModel
-import com.example.finalprojectgg.domain.model.listDisaster
+import com.example.finalprojectgg.domain.model.ReportModel
 import com.example.finalprojectgg.domain.model.listProvince
 import com.example.finalprojectgg.ui.components.FlowRow
+import com.example.finalprojectgg.ui.components.SheetLocationPicker
+import com.example.finalprojectgg.ui.screens.mapdisaster.components.DisasterItem
+import com.example.finalprojectgg.ui.screens.mapdisaster.components.SearchLocationComponent
 import com.example.finalprojectgg.ui.screens.state.FilterEvent
 import com.example.finalprojectgg.ui.screens.state.FilterState
 import com.example.finalprojectgg.ui.screens.state.TimePeriod
@@ -60,7 +62,6 @@ import com.maxkeppeler.sheets.calendar.models.CalendarConfig
 import com.maxkeppeler.sheets.calendar.models.CalendarSelection
 import com.maxkeppeler.sheets.calendar.models.CalendarStyle
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -74,9 +75,11 @@ fun SearchDisasterScreen(
 ) {
     val sheetStateFilter =
         rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
+    val sheetStateLocationPicker =
+        rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
     var isTransitionAnimation by remember { mutableStateOf(true) }
     val scope = rememberCoroutineScope()
-    val searchDisasterScreenState = viewModel.searchDisasterScreenViewState
+    val searchDisasterScreenState by viewModel.searchDisasterScreenViewState.collectAsStateWithLifecycle()
     val filterState by viewModel.filterState.collectAsStateWithLifecycle()
 
     Box(
@@ -89,11 +92,9 @@ fun SearchDisasterScreen(
                 delay(500)
                 isTransitionAnimation = false
             }
-            searchDisasterScreenState.collectLatest {
-                it.filterClicked = {
-                    scope.launch {
-                        sheetStateFilter.show()
-                    }
+            searchDisasterScreenState.filterClicked = {
+                scope.launch {
+                    sheetStateFilter.show()
                 }
             }
         }
@@ -107,7 +108,10 @@ fun SearchDisasterScreen(
                         FilterEvent.OnTimePeriodChanged(null)
                     )
                 })
-            SearchDisasterListView()
+            SearchDisasterListView(
+                listSearchResult = searchDisasterScreenState.provinceSearch,
+                listRelatedSearch = searchDisasterScreenState.reportsRelated
+            )
         }
 
         ModalBottomSheetLayout(
@@ -115,12 +119,32 @@ fun SearchDisasterScreen(
             sheetBackgroundColor = MaterialTheme.colorScheme.surface,
             sheetContentColor = MaterialTheme.colorScheme.onSurface,
             sheetContent = {
-                FilterSheet(filterState.timePeriodFilter, onFilterTimePeriodChanged = {
-                    viewModel.onFilterEvent(FilterEvent.OnTimePeriodChanged(it))
-                })
+                FilterSheet(
+                    filterState.timePeriodFilter,
+                    filterProvince = filterState.provinceFilter,
+                    onFilterTimePeriodChanged = {
+                        viewModel.onFilterEvent(FilterEvent.OnTimePeriodChanged(it))
+                    },
+                    onExpandedFilterProvince = {
+                        scope.launch {
+                            sheetStateLocationPicker.show()
+                        }
+                    },
+                    onItemFilterProvinceClick = {
+                        viewModel.onFilterEvent(
+                            FilterEvent.OnProvinceChanged(
+                                it
+                            )
+                        )
+                    }
+                )
             }) {
-
         }
+
+        SheetLocationPicker(
+            sheetState = sheetStateLocationPicker,
+            filterState = filterState,
+            onItemClick = { viewModel.onFilterEvent(FilterEvent.OnProvinceChanged(it)) })
     }
 }
 
@@ -132,7 +156,10 @@ fun SearchDisasterScreen(
 @Composable
 fun FilterSheet(
     filterTimePeriod: TimePeriod?,
-    onFilterTimePeriodChanged: (TimePeriod) -> Unit
+    filterProvince:List<FilterProvinceModel>,
+    onFilterTimePeriodChanged: (TimePeriod) -> Unit,
+    onExpandedFilterProvince: () -> Unit,
+    onItemFilterProvinceClick: (FilterProvinceModel) -> Unit
 ) {
     Box(
         modifier = Modifier
@@ -246,37 +273,31 @@ fun FilterSheet(
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
             ) {
-                Text(
-                    text = "Filter",
-                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                FlowRow() {
-                    repeat(listDisaster.size) {
-                        val item = listDisaster[it]
-                        Chip(modifier = Modifier.padding(end = 8.dp), onClick = { /*TODO*/ }) {
-                            Text(text = item.title)
-                        }
-                    }
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text(
+                        text = "Lokasi",
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                    )
+                    Text(
+                        text = "See All",
+                        style = MaterialTheme.typography.labelMedium,
+                        modifier = Modifier.clickable {
+                            onExpandedFilterProvince()
+                        })
                 }
-            }
-
-            Column(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
-            ) {
-                Text(
-                    text = "Lokasi",
-                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
-                )
                 Spacer(modifier = Modifier.height(8.dp))
                 FlowRow() {
-                    repeat(listProvince.size) {
-                        val item = listProvince[it]
-                        Chip(modifier = Modifier.padding(end = 8.dp), onClick = { /*TODO*/ }) {
-                            Text(text = item.name)
-                        }
+                    repeat(8) {
+                        val item = filterProvince[it]
+                        FilterChip(
+                            selected = item.isActive,
+                            onClick = { onItemFilterProvinceClick(item) },
+                            label = {
+                                Text(
+                                    text = item.name, style = MaterialTheme.typography.labelMedium
+                                )
+                            })
+                        Spacer(modifier = Modifier.width(8.dp))
                     }
                 }
             }
@@ -330,6 +351,15 @@ fun FilterActiveChip(
         val disasterActive = filterState.disasterFilter.filter { it.selected }
         val provinceActive = filterState.provinceFilter.filter { it.isActive }
 
+        if (disasterActive.isEmpty() && provinceActive.isEmpty() && filterState.timePeriodFilter == null) {
+            item {
+                Text(
+                    text = "No Filter Active",
+                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.7f)
+                )
+            }
+        }
+
         itemsIndexed(items = disasterActive, key = { _, item -> item.title }) { index, item ->
             AssistChip(
                 onClick = { onRemoveDisasterFilter(item) },
@@ -351,15 +381,30 @@ fun FilterActiveChip(
 }
 
 @Composable
-fun SearchDisasterListView() {
+fun SearchDisasterListView(
+    listSearchResult: List<FilterProvinceModel>,
+    listRelatedSearch: List<ReportModel>
+) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
-        items(10) {
-//            DisasterItem()
+        itemsIndexed(items = listSearchResult) { index, item ->
+            SearchLocationComponent(title = item.name, onClick = {
+                //TODO Zoom to point
+            })
+        }
+
+        item {
+            Column(Modifier.padding(vertical = 16.dp)) {
+                Text(text = "Related Search", style = MaterialTheme.typography.titleMedium)
+            }
+        }
+
+        items(items = listRelatedSearch, key = { it.id }) { item ->
+            DisasterItem(item = item)
         }
     }
 }

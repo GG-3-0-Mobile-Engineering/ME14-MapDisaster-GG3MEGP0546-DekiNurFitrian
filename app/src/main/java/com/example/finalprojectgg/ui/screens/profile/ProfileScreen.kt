@@ -18,8 +18,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
-import androidx.compose.material.ModalBottomSheetLayout
-import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowRight
@@ -41,10 +39,13 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
-import com.example.finalprojectgg.ui.screens.profile.componentes.SheetContentLocationPicker
+import com.example.finalprojectgg.ui.components.SheetContentLocationPicker
+import com.example.finalprojectgg.ui.components.SheetLocationPicker
 import com.example.finalprojectgg.ui.screens.profile.componentes.ThemeSwitcher
 import com.example.finalprojectgg.ui.screens.profile.state.ProfileScreenEvent
+import com.example.finalprojectgg.ui.screens.state.FilterState
 import com.example.finalprojectgg.ui.viewmodel.MainViewModel
 import kotlinx.coroutines.launch
 
@@ -55,6 +56,7 @@ fun ProfileScreen(
     viewModel: MainViewModel
 ) {
     val themeState by viewModel.themeState
+    val filterState by viewModel.filterState.collectAsStateWithLifecycle()
     Box(
         Modifier
             .fillMaxSize()
@@ -121,7 +123,10 @@ fun ProfileScreen(
                         contentColor = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 ) {
-                    Column(modifier = Modifier.padding(all = 16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Column(
+                        modifier = Modifier.padding(all = 16.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier.clickable {
@@ -146,7 +151,10 @@ fun ProfileScreen(
                                 )
                             }
                             IconButton(onClick = { /*TODO*/ }) {
-                                Icon(imageVector = Icons.Default.ArrowRight, contentDescription = null)
+                                Icon(
+                                    imageVector = Icons.Default.ArrowRight,
+                                    contentDescription = null
+                                )
                             }
                         }
                         Spacer(
@@ -184,24 +192,10 @@ fun ProfileScreen(
                 }
             }
         }
-        SheetLocationPicker(sheetState)
+        SheetLocationPicker(
+            sheetState = sheetState,
+            filterState = filterState,
+            onItemClick = {}
+        )
     }
-}
-
-@OptIn(ExperimentalMaterialApi::class)
-@Composable
-fun SheetLocationPicker(
-    sheetState: ModalBottomSheetState
-) {
-    ModalBottomSheetLayout(
-        sheetContent = {
-            SheetContentLocationPicker()
-        },
-        sheetState = sheetState,
-        sheetBackgroundColor = MaterialTheme.colorScheme.surface,
-        sheetContentColor = MaterialTheme.colorScheme.onSurface
-    ) {
-
-    }
-
 }

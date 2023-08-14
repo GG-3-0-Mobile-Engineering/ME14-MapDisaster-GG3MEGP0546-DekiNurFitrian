@@ -113,6 +113,9 @@ fun MainScreen(
                                 },
                                 onTrailingIconClicked = {
                                     viewModel.onMainScreenEvent(MainScreenEvent.FilterClicked)
+                                },
+                                onSearchValueChange = {
+                                    viewModel.onMainScreenEvent(MainScreenEvent.SearchChanged(it))
                                 }
                             )
 

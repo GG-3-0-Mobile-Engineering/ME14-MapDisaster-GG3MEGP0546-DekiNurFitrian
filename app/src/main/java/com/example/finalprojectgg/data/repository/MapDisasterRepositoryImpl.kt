@@ -11,7 +11,9 @@ import com.example.finalprojectgg.data.source.remote.RemoteDataSource
 import com.example.finalprojectgg.data.source.remote.network.ApiResponse
 import com.example.finalprojectgg.data.source.remote.response.GeometriesItem
 import com.example.finalprojectgg.domain.model.FilterActive
+import com.example.finalprojectgg.domain.model.FilterProvinceModel
 import com.example.finalprojectgg.domain.model.ReportModel
+import com.example.finalprojectgg.domain.model.listProvince
 import com.example.finalprojectgg.domain.repository.MapDisasterRepository
 import com.example.finalprojectgg.ui.screens.state.FilterEvent
 import com.example.finalprojectgg.ui.screens.state.FilterState
@@ -73,8 +75,8 @@ class MapDisasterRepositoryImpl @Inject constructor(
                         val listReport = apiResponse.data.map {
                             Utils.DataMapper.reportApiToReportModel(it)
                         }
-                        val listReportFiltered = Utils.Filter.recentReport(filterQuery,listReport)
-                        Log.d("FilteredDisasater",listReportFiltered.map { it.id }.toString())
+                        val listReportFiltered = Utils.Filter.recentReport(filterQuery, listReport)
+                        Log.d("FilteredDisasater", listReportFiltered.map { it.id }.toString())
                         emit(Resource.Success(listReportFiltered))
                     }
 
@@ -118,4 +120,10 @@ class MapDisasterRepositoryImpl @Inject constructor(
         }
     }
 
+    override fun getProvinceByQuery(query: String): Flow<List<FilterProvinceModel>> =
+        localDataSource.getAllProvincesByQuery(query).map { data ->
+            data.map {
+                Utils.DataMapper.provinceEntityToProvinceModel(it)
+            }
+        }
 }

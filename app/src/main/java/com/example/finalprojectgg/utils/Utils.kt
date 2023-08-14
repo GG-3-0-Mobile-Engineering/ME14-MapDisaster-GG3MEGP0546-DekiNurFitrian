@@ -1,13 +1,37 @@
 package com.example.finalprojectgg.utils
 
+import android.content.Context
+import android.graphics.Bitmap
+import androidx.core.content.ContextCompat
+import com.example.finalprojectgg.data.source.local.entity.ProvinceEntity
 import com.example.finalprojectgg.data.source.local.entity.ReportEntity
 import com.example.finalprojectgg.data.source.remote.response.GeometriesItem
 import com.example.finalprojectgg.domain.model.FilterActive
+import com.example.finalprojectgg.domain.model.FilterProvinceModel
 import com.example.finalprojectgg.domain.model.ReportModel
+import com.google.android.gms.maps.model.BitmapDescriptor
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 
 class Utils {
     object DataMapper {
+
+        fun provinceModelToProvinceEntity(data: FilterProvinceModel): ProvinceEntity =
+            ProvinceEntity(
+                provinceCode = data.id,
+                name = data.name,
+                latitude = data.coordinate.latitude,
+                longitude = data.coordinate.longitude
+            )
+
+        fun provinceEntityToProvinceModel(data: ProvinceEntity): FilterProvinceModel =
+            FilterProvinceModel(
+                id = data.provinceCode,
+                name = data.name ?: "",
+                coordinate = LatLng(data.latitude ?: 0.0, data.longitude ?: 0.0),
+                isActive = false
+            )
+
         fun reportApiToReportModel(data: GeometriesItem?): ReportModel {
             val properties = data?.properties
             val coordinates = data?.coordinates
@@ -39,7 +63,7 @@ class Utils {
                 category = properties?.disasterType ?: "",
                 latitude = coordinates?.get(1) ?: 0.0,
                 longitude = coordinates?.get(0) ?: 0.0,
-                province = properties?.tags?.regionCode ?: ""
+                province = properties?.tags?.instanceRegionCode ?: ""
             )
         }
 
@@ -104,5 +128,27 @@ class Utils {
             return temp.sortedByDescending { it.id }
         }
 
+    }
+
+    object Maps {
+        fun bitmapDescriptor(
+            context: Context,
+            vectorResId: Int
+        ): BitmapDescriptor? {
+
+            // retrieve the actual drawable
+            val drawable = ContextCompat.getDrawable(context, vectorResId) ?: return null
+            drawable.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
+            val bm = Bitmap.createBitmap(
+                drawable.intrinsicWidth,
+                drawable.intrinsicHeight,
+                Bitmap.Config.ARGB_8888
+            )
+
+            // draw it onto the bitmap
+            val canvas = android.graphics.Canvas(bm)
+            drawable.draw(canvas)
+            return BitmapDescriptorFactory.fromBitmap(bm)
+        }
     }
 }

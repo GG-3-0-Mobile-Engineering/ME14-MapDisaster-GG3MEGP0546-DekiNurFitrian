@@ -9,7 +9,7 @@ buildscript {
 
         ext.kotlin_coroutines_version = "1.4.0"
 
-        ext.room_version = "2.5.2"
+        ext.room_version = "2.5.1"
 
         ext.maxkeppeler = "1.2.0"
     }

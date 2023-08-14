@@ -48,7 +48,8 @@ fun SearchBarView(
     searchEnabled: Boolean,
     onSearchClicked: () -> Unit,
     onLeadingIconClicked: () -> Unit,
-    onTrailingIconClicked: () -> Unit
+    onTrailingIconClicked: () -> Unit,
+    onSearchValueChange: (String) -> Unit
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val focusRequester = remember {
@@ -74,7 +75,10 @@ fun SearchBarView(
             CustomTextField(
                 value = text,
                 textStyle = MaterialTheme.typography.bodyLarge,
-                onValueChange = { text = it },
+                onValueChange = {
+                    text = it
+                    onSearchValueChange(it)
+                },
                 placeholder = { Text("Search") },
                 colors = TextFieldDefaults.textFieldColors(
                     containerColor = Color.Transparent,

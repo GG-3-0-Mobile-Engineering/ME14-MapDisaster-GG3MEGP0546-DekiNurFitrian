@@ -26,7 +26,10 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -51,14 +54,14 @@ class MainViewModel @Inject constructor(
 
     fun onFilterEvent(event: FilterEvent) = repo.updateFilterActive(event)
 
-
     init {
         viewModelScope.launch {
-            mapDisasterUseCase.getReports().collectLatest {
-                when (it) {
+            mapDisasterUseCase.getReports().collectLatest { resource ->
+                when (resource) {
                     is Resource.Success -> {
                         mapScreenViewState.update { state ->
-                            state.copy(reportModels = it.data)
+                            Log.d("Report",resource.data.map { it.province }.toString())
+                            state.copy(reportModels = resource.data)
                         }
                     }
 
@@ -70,7 +73,7 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    @OptIn(ExperimentalMaterialApi::class, FlowPreview::class)
+    @OptIn(ExperimentalMaterialApi::class)
     fun onMapScreenEvent(event: MapScreenEvent) {
         when (event) {
             is MapScreenEvent.BottomSheetChanged -> {
@@ -96,12 +99,13 @@ class MainViewModel @Inject constructor(
             }
 
             is MapScreenEvent.GetReport -> {
-
+                mapDisasterUseCase.getReports()
             }
         }
     }
 
 
+    @OptIn(FlowPreview::class)
     fun onMainScreenEvent(event: MainScreenEvent) {
         when (event) {
             is MainScreenEvent.ScreenChanged -> {
@@ -115,6 +119,17 @@ class MainViewModel @Inject constructor(
 
             is MainScreenEvent.FilterClicked -> {
                 searchDisasterScreenViewState.value.filterClicked.invoke()
+            }
+
+            is MainScreenEvent.SearchChanged -> {
+                viewModelScope.launch {
+                    repo.getProvinceByQuery(event.query).debounce(200).collect {
+                        Log.d("Search",it.toString())
+                        searchDisasterScreenViewState.update { state ->
+                            state.copy(provinceSearch = it)
+                        }
+                    }
+                }
             }
         }
     }
