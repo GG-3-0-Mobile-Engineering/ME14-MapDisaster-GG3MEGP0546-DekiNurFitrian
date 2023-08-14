@@ -46,7 +46,7 @@ class Utils {
                 latLng = coordinates.let {
                     LatLng(it?.get(0) ?: 0.0, it?.get(1) ?: 0.0)
                 },
-                province = properties?.tags?.regionCode ?: ""
+                province = properties?.tags?.instanceRegionCode ?: ""
             )
         }
 

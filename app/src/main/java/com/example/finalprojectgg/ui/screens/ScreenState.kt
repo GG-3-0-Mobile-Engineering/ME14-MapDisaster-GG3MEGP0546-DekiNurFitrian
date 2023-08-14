@@ -4,5 +4,6 @@ interface ScreenState {
     var isProgress: Boolean
     var isError:Boolean
     var isContent:Boolean
+    var isEmpty:Boolean
 }
 

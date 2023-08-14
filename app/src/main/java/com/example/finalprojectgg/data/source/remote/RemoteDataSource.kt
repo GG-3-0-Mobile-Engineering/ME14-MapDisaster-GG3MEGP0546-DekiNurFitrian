@@ -63,4 +63,32 @@ class RemoteDataSource @Inject constructor(private val apiService: PetaBencanaAp
             }
         }.flowOn(Dispatchers.IO)
     }
+
+    suspend fun getFloodGauges(
+        admin: String,
+        format: String,
+    ): Flow<ApiResponse<List<GeometriesItem?>>> {
+        return flow {
+            try {
+                val response = apiService.getFloodgauges(admin = "", format = "", geoFormat = "")
+                val dataArray = response.result?.objects?.output?.geometries
+
+                dataArray?.let {
+                    if (dataArray.isNotEmpty()) {
+                        emit(ApiResponse.Success(response.result.objects.output.geometries))
+                    } else {
+                        emit(ApiResponse.Empty)
+                    }
+                }
+            } catch (e: HttpException) {
+                emit(ApiResponse.Error(e))
+                Log.e("Remote Data Source", e.toString())
+            } catch (e: IOException) {
+                emit(ApiResponse.Error(e))
+                Log.e("Remote Data Source", "Check Connection")
+            }
+        }.flowOn(Dispatchers.IO)
+    }
+
+
 }

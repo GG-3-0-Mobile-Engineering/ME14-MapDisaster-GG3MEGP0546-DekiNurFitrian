@@ -10,9 +10,10 @@ data class MapState(
     override var isProgress: Boolean = true,
     override var isError: Boolean = false,
     override var isContent: Boolean = false,
+    override var isEmpty: Boolean = false,
     var isDetail:Boolean = false,
     var reportModels: List<ReportModel> = listOf(),
     var properties: MapProperties = MapProperties(
         mapStyleOptions = MapStyleOptions(MapStyle.darkMapStyle),
-    )
+    ),
 ): ScreenState

@@ -1,4 +1,4 @@
-package com.example.finalprojectgg.ui.screens.mapdisaster.components
+package com.example.finalprojectgg.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -29,12 +29,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.finalprojectgg.R
-import com.example.finalprojectgg.domain.model.ReportModel
+import com.example.finalprojectgg.ui.screens.mapdisaster.components.ChipStatus
 
+@Preview(showBackground = true)
 @Composable
-fun DisasterItem(modifier: Modifier = Modifier, item: ReportModel) {
+fun LoadingReportView() {
     Column(
-        modifier
+        Modifier
             .fillMaxWidth()
             .clip(MaterialTheme.shapes.medium)
             .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f))
@@ -46,24 +47,8 @@ fun DisasterItem(modifier: Modifier = Modifier, item: ReportModel) {
                 .fillMaxWidth()
                 .height(200.dp)
                 .clip(ShapeDefaults.Small)
-        ) {
-
-            AsyncImage(
-                model = item.imgUrl,
-                error = painterResource(id = R.drawable.img_empty_image),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .clip(MaterialTheme.shapes.medium)
-            )
-            ChipStatus(
-                text = item.status,
-                modifier = Modifier.graphicsLayer {
-                translationY = 20f
-                translationX = 20f
-            })
-        }
+                .shimmerEffect()
+        )
         Row(
             Modifier
                 .fillMaxWidth()
@@ -71,22 +56,20 @@ fun DisasterItem(modifier: Modifier = Modifier, item: ReportModel) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    modifier = Modifier.size(24.dp),
-                    painter = painterResource(id = R.drawable.ic_pin_outlined),
-                    contentDescription = null
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = "Jakarta, Indonesia",
-                    style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold)
-                )
-            }
+            Box(
+                Modifier
+                    .height(16.dp)
+                    .width(96.dp)
+                    .clip(MaterialTheme.shapes.extraSmall)
+                    .shimmerEffect()
+            )
 
-            Text(
-                text = "9.40PM",
-                style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold)
+            Box(
+                Modifier
+                    .height(16.dp)
+                    .width(48.dp)
+                    .clip(MaterialTheme.shapes.extraSmall)
+                    .shimmerEffect()
             )
         }
 
@@ -95,23 +78,25 @@ fun DisasterItem(modifier: Modifier = Modifier, item: ReportModel) {
                 .fillMaxWidth()
                 .padding(horizontal = 8.dp, vertical = 8.dp)
         ) {
-            Text(
-                text = item.desc,
-                style = MaterialTheme.typography.bodyMedium,
-                textAlign = TextAlign.Justify
-            )
+            repeat(3){
+                Box(
+                    Modifier
+                        .height(16.dp)
+                        .fillMaxWidth()
+                        .clip(MaterialTheme.shapes.extraSmall)
+                        .shimmerEffect()
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+            }
         }
-
-        ChipStatus(
-            text = item.category,
-            modifier = Modifier
+        Box(
+            Modifier
                 .padding(horizontal = 8.dp)
                 .padding(bottom = 8.dp)
+                .height(16.dp)
+                .width(96.dp)
+                .clip(MaterialTheme.shapes.extraSmall)
+                .shimmerEffect()
         )
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun CardItemPrev() {
 }

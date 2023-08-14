@@ -16,21 +16,13 @@ sealed class Screens(
     companion object {
         const val ROOT_ROUTE = "ROOT_ROUTE"
     }
-
     object Splash : Screens("Splash-Screen")
     object MapDisaster : Screens(
         "MapDisaster-Screen",
         "Map",
         Icons.Default.Place
     )
-
-    object SearchDisaster : Screens(
-        "SearchDisaster-Screen",
-        "Search"
-    )
-
     object MapDisasterSearch : Screens("MapDisasterSearch-Screen")
-    object Detail : Screens("Detail-Screen")
     object Profile : Screens(
         "Profile-Screen",
         "Profile",
