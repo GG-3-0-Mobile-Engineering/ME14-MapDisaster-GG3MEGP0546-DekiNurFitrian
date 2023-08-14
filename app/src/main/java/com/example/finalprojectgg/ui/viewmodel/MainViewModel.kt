@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.finalprojectgg.data.Resource
 import com.example.finalprojectgg.domain.repository.MapDisasterRepository
+import com.example.finalprojectgg.domain.usecase.MapDisasterUseCase
 import com.example.finalprojectgg.domain.usecase.MapDisasterUseCaseImpl
 import com.example.finalprojectgg.ui.navigation.Screens
 import com.example.finalprojectgg.ui.screens.main.MainScreenEvent
@@ -37,7 +38,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val mapDisasterUseCase: MapDisasterUseCaseImpl,
+    private val mapDisasterUseCase: MapDisasterUseCase,
     private val repo: MapDisasterRepository
 ) :
     ViewModel() {
@@ -60,13 +61,27 @@ class MainViewModel @Inject constructor(
                 when (resource) {
                     is Resource.Success -> {
                         mapScreenViewState.update { state ->
-                            Log.d("Report",resource.data.map { it.province }.toString())
-                            state.copy(reportModels = resource.data)
+                            state.copy(isProgress = false, reportModels = resource.data)
                         }
                     }
 
-                    else -> {
-                        Log.d("Report", "Error")
+                    is Resource.Empty -> {
+                        mapScreenViewState.update { state ->
+                            state.copy(isEmpty = true)
+                        }
+
+                    }
+
+                    is Resource.Loading -> {
+                        mapScreenViewState.update { state ->
+                            state.copy(isProgress = true)
+                        }
+                    }
+
+                    is Resource.Error -> {
+                        mapScreenViewState.update { state ->
+                            state.copy(isError = true)
+                        }
                     }
                 }
             }
@@ -124,7 +139,7 @@ class MainViewModel @Inject constructor(
             is MainScreenEvent.SearchChanged -> {
                 viewModelScope.launch {
                     repo.getProvinceByQuery(event.query).debounce(200).collect {
-                        Log.d("Search",it.toString())
+                        Log.d("Search", it.toString())
                         searchDisasterScreenViewState.update { state ->
                             state.copy(provinceSearch = it)
                         }

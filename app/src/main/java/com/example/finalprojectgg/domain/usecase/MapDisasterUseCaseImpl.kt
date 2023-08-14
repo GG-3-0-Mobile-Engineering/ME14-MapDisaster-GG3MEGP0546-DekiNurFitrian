@@ -14,7 +14,7 @@ class MapDisasterUseCaseImpl @Inject constructor(
 ) :
     MapDisasterUseCase {
 
-    fun getFilterActive() = combine(
+    override fun getFilterActive() = combine(
         repo.getFilter(),
         repo.getFilterActive()
     ) { filterState, filterActive ->
