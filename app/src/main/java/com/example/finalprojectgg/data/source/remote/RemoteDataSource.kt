@@ -42,9 +42,10 @@ class RemoteDataSource @Inject constructor(private val apiService: PetaBencanaAp
         start: String,
         end: String
     ): Flow<ApiResponse<List<GeometriesItem?>>> {
+        Log.d("Date",start+end)
         return flow {
             try {
-                val response = apiService.getReportsArchive(start = "2023-01-04T00:00:00+0700",end = "2023-02-10T00:00:00+0700")
+                val response = apiService.getReportsArchive(start = start,end = end)
                 val dataArray = response.result?.objects?.output?.geometries
 
                 dataArray?.let {

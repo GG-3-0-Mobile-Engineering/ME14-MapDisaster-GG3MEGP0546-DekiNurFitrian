@@ -1,6 +1,8 @@
 package com.example.finalprojectgg.data.repository
 
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import com.example.finalprojectgg.data.Resource
@@ -34,8 +36,10 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.math.log
 
 @Singleton
 class MapDisasterRepositoryImpl @Inject constructor(
@@ -69,12 +73,17 @@ class MapDisasterRepositoryImpl @Inject constructor(
         }.asFlow().flowOn(Dispatchers.IO)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun getReportsArchive(filterQuery: FilterActive): Flow<Resource<List<ReportModel>>> {
         return flow {
             emit(Resource.Loading())
+            val filterTimePeriod = filterQuery.filterByTimePeriod
+            val df = DateTimeFormatter.ofPattern("YYYY-MM-dd")
+            val start = filterTimePeriod?.startTime?.format(df)
+            val end = filterTimePeriod?.endTime?.format(df)
             remoteDataSource.getReportsArchive(
-                start = "2023-01-04T00%3A00%3A00%2B0700",
-                end = "2023-02-04T00%3A00%3A00%2B0700"
+                start = "${start}T00:00:00+0700",
+                end = "${end}T00:00:00+0700"
             ).collect { apiResponse ->
                 when (apiResponse) {
                     is ApiResponse.Success -> {
@@ -82,7 +91,6 @@ class MapDisasterRepositoryImpl @Inject constructor(
                             Utils.DataMapper.reportApiToReportModel(it)
                         }
                         val listReportFiltered = Utils.Filter.recentReport(filterQuery, listReport)
-                        Log.d("FilteredDisasater", listReportFiltered.map { it.id }.toString())
                         emit(Resource.Success(listReportFiltered))
                     }
 
@@ -121,6 +129,12 @@ class MapDisasterRepositoryImpl @Inject constructor(
 
             is FilterEvent.OnTimePeriodChanged -> {
                  filterActive.value.filterByTimePeriod = event.timePeriod
+                CoroutineScope(Dispatchers.IO).launch {
+                    filterActiveFlow.emit(filterActive.value)
+                }
+            }
+
+            is FilterEvent.OnInit -> {
                 CoroutineScope(Dispatchers.IO).launch {
                     filterActiveFlow.emit(filterActive.value)
                 }

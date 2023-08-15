@@ -150,7 +150,6 @@ fun SearchDisasterScreen(
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(
-    ExperimentalMaterialApi::class,
     ExperimentalMaterial3Api::class
 )
 @Composable

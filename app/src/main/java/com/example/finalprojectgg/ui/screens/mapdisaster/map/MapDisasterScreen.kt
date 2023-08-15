@@ -81,6 +81,7 @@ fun MapDisasterScreen(
     }
 
     LaunchedEffect(Unit) {
+        viewModel.onFilterEvent(FilterEvent.OnInit)
         if (!permissionGranted) {
             multiplePermissionsState.launchMultiplePermissionRequest()
         }

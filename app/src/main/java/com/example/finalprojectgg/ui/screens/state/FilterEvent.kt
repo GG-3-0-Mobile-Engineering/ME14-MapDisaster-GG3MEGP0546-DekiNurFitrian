@@ -7,4 +7,5 @@ sealed class FilterEvent{
     data class OnDisasterChanged(val disaster:FilterDisasterModel):FilterEvent()
     data class OnTimePeriodChanged(val timePeriod: TimePeriod?):FilterEvent()
     data class OnProvinceChanged(val province:FilterProvinceModel):FilterEvent()
+    object OnInit:FilterEvent()
 }
