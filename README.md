@@ -8,7 +8,6 @@ Project **Map-Disaster** yang saya kerjakan ini merupakan salah satu tugas akhir
 
 Beberapa fitur yang akan sudah ada dan akan ada kedepannya
 ## Features 🚀
----------
 Beberapa fitur utama yang ada dalam project ini adalah:
 - **Live Report** - Menampilkan list bencana
 - **Search Filter** - Menampilkan bencana dengan filter
@@ -19,7 +18,6 @@ Beberapa fitur utama yang ada dalam project ini adalah:
 Note: notification dapat dijalanankan manual dengan sesuai user input, untuk mensimulasi update bencana
 
 ## Tech-Architect 🖼
------
 Project ini dibangun menggunakan beberapa tools & teknologi seperti yang ada di bawah ini:
 - Room Database
 - Compose UI
@@ -39,7 +37,6 @@ Project ini dibangun menggunakan beberapa tools & teknologi seperti yang ada di 
 - API : data.petabencana.id
 
 ## How to run?
------
 1. Make a **repository clone** in your local
     ```
     git clone https://github.com/GG-3-0-Mobile-Engineering/ME14-MapDisaster-GG3MEGP0546-DekiNurFitrian.git
@@ -57,7 +54,6 @@ Project ini dibangun menggunakan beberapa tools & teknologi seperti yang ada di 
 3. Java Version 17
 
 ### Contact Me
------
 | Platfrom | Link to |
 | ------ | ------ |
 | Instagram | [@d.dnfi][ig] |
