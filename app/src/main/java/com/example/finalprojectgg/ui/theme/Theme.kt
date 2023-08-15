@@ -16,6 +16,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.TextStyle
 import androidx.core.view.WindowCompat
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 private val LightColorScheme = lightColorScheme(
     primary = md_theme_light_primary,
@@ -92,18 +93,18 @@ fun FinalProjectGGTheme(
 ) {
     
     val colorScheme = when {
-//        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-//            val context = LocalContext.current
-//            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-//        }
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }
     val view = LocalView.current
+    val systemUiController = rememberSystemUiController()
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            window.statusBarColor = Color.Transparent.toArgb()
+            systemUiController.setStatusBarColor(
+                color = Color.Transparent,
+                darkIcons = !darkTheme
+            )
             WindowCompat.setDecorFitsSystemWindows(window,false)
         }
     }

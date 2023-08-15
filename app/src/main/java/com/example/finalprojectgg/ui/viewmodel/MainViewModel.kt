@@ -9,7 +9,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.finalprojectgg.data.Resource
 import com.example.finalprojectgg.domain.repository.MapDisasterRepository
 import com.example.finalprojectgg.domain.usecase.MapDisasterUseCase
-import com.example.finalprojectgg.domain.usecase.MapDisasterUseCaseImpl
 import com.example.finalprojectgg.ui.navigation.Screens
 import com.example.finalprojectgg.ui.screens.main.MainScreenEvent
 import com.example.finalprojectgg.ui.screens.main.state.MainScreenViewState
@@ -27,10 +26,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -48,7 +45,7 @@ class MainViewModel @Inject constructor(
 
     val searchDisasterScreenViewState = MutableStateFlow(SearchDisasterScreenState())
 
-    val themeState = mutableStateOf(false)
+    var isDarkTheme by mutableStateOf(false)
 
     val filterState = mapDisasterUseCase.getFilterActive()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), FilterState())
@@ -152,8 +149,8 @@ class MainViewModel @Inject constructor(
     fun onProfileScreenEvent(event: ProfileScreenEvent) {
         when (event) {
             is ProfileScreenEvent.ThemeSwitchChanged -> {
-                themeState.value = !themeState.value
-                if (themeState.value) {
+                isDarkTheme = !isDarkTheme
+                if (isDarkTheme) {
                     mapScreenViewState.value = mapScreenViewState.value.copy(
                         properties = MapProperties(
                             mapStyleOptions = MapStyleOptions(MapStyle.darkMapStyle)

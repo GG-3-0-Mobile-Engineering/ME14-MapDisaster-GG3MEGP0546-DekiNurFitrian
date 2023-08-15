@@ -23,7 +23,6 @@ import androidx.compose.material3.Switch
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowRight
 import androidx.compose.material.icons.filled.DarkMode
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.PinDrop
 import androidx.compose.material.icons.filled.Place
@@ -32,8 +31,6 @@ import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -53,12 +50,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.example.finalprojectgg.service.DisasterNotificationService
-import com.example.finalprojectgg.ui.components.SheetContentLocationPicker
 import com.example.finalprojectgg.ui.components.SheetLocationPicker
 import com.example.finalprojectgg.ui.screens.profile.componentes.InformationDialogView
 import com.example.finalprojectgg.ui.screens.profile.componentes.ThemeSwitcher
 import com.example.finalprojectgg.ui.screens.profile.state.ProfileScreenEvent
-import com.example.finalprojectgg.ui.screens.state.FilterState
 import com.example.finalprojectgg.ui.viewmodel.MainViewModel
 import kotlinx.coroutines.launch
 
@@ -71,7 +66,7 @@ fun ProfileScreen(
     val context = LocalContext.current
     var notificationDialogState by remember { mutableStateOf(false) }
     var locationDialogState by remember { mutableStateOf(false) }
-    val themeState by viewModel.themeState
+    val themeState = viewModel.isDarkTheme
     val filterState by viewModel.filterState.collectAsStateWithLifecycle()
     val notificationService = DisasterNotificationService(context)
     var notificationState by remember { mutableStateOf(false) }

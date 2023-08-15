@@ -1,5 +1,6 @@
 package com.example.finalprojectgg
 
+import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -8,6 +9,7 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -24,9 +26,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            val viewModel:MainViewModel = hiltViewModel()
-            val themeState by viewModel.themeState
-            FinalProjectGGTheme(darkTheme = themeState) {
+            val viewModel: MainViewModel = hiltViewModel()
+            FinalProjectGGTheme(darkTheme = viewModel.isDarkTheme) {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),

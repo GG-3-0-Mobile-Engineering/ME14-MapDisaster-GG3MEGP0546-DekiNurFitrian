@@ -5,6 +5,8 @@ import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -61,6 +63,10 @@ fun MainScreen(
 
     val mainScreenViewState by viewModel.mainScreenViewState.collectAsStateWithLifecycle()
     val mapState by viewModel.mapScreenViewState.collectAsStateWithLifecycle()
+    val initTheme = isSystemInDarkTheme()
+    LaunchedEffect(Unit){
+        viewModel.isDarkTheme = initTheme
+    }
 
     when (currentDestination) {
         Screens.MapDisaster.route -> {
@@ -93,7 +99,9 @@ fun MainScreen(
                 enter = slideInVertically { -it },
                 exit = slideOutVertically { -it }) {
                 TopAppBar(
-                    modifier = Modifier.statusBarsPadding(),
+                    Modifier
+                        .background(MaterialTheme.colorScheme.surface.copy(alpha = mainScreenViewState.topAppBarAlpha),)
+                        .statusBarsPadding(),
                     backgroundColor = MaterialTheme.colorScheme.surface.copy(alpha = mainScreenViewState.topAppBarAlpha),
                     elevation = 0.dp
                 ) {
@@ -133,7 +141,6 @@ fun MainScreen(
             }
         },
     ) {
-
         Box(
             modifier = modifier.then(
                 if (bottomBarState) {
