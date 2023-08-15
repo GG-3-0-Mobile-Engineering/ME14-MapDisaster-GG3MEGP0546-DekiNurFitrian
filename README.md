@@ -68,6 +68,6 @@ Project ini dibangun menggunakan beberapa tools & teknologi seperti yang ada di 
 [linkedin]: <https://www.linkedin.com/in/dekinfi/>
 [be]: <https://www.behance.net/dekinfi>
 [maxkeppeler]: <https://github.com/maxkeppeler/sheets-compose-dialogs/tree/main>
-[docu]: <https://github.com/maxkeppeler/sheets-compose-dialogs/tree/main>
+[docu]: <https://drive.google.com/drive/u/0/folders/1MZ2AhqvElvy9okKWvfVqN-ynf_UaQ4uG>
 
 
