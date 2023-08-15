@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -38,7 +39,8 @@ fun DisasterItem(modifier: Modifier = Modifier, item: ReportModel) {
             .fillMaxWidth()
             .clip(MaterialTheme.shapes.medium)
             .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f))
-            .padding(8.dp),
+            .padding(8.dp)
+            .testTag("DisasterItem"),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Box(

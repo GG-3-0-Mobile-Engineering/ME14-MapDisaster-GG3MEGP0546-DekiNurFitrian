@@ -21,7 +21,8 @@ class FakeMapRepository:MapDisasterRepository {
     /**
      * Hot flow only for test filterActive.
      */
-    private val filterActive= MutableStateFlow(FilterActive())
+    val filterActive: MutableSharedFlow<FilterActive> =
+        MutableSharedFlow(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
     /**
      * Hot flow only for test reports.
      */
@@ -42,7 +43,7 @@ class FakeMapRepository:MapDisasterRepository {
 
     override fun getReportsArchive(filterQuery: FilterActive): Flow<Resource<List<ReportModel>>> = reportsArchive
 
-    override fun getFilterActive(): MutableStateFlow<FilterActive> = filterActive
+    override fun getFilterActive(): SharedFlow<FilterActive> = filterActive
 
     override fun getFilter(): MutableStateFlow<FilterState> = MutableStateFlow(FilterState())
 

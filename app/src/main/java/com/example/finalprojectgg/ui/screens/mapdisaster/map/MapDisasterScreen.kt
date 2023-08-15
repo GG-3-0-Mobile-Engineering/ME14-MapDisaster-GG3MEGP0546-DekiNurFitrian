@@ -1,12 +1,8 @@
 package com.example.finalprojectgg.ui.screens.mapdisaster.map
 
 import android.Manifest
-import android.content.Context
-import android.content.pm.PackageManager
 import android.os.Build
-import androidx.activity.compose.ManagedActivityResultLauncher
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,9 +14,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Icon
+import androidx.compose.material.SwipeableState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.rememberSwipeableState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ShapeDefaults
@@ -30,27 +31,27 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.finalprojectgg.domain.model.FilterDisasterModel
+import com.example.finalprojectgg.ui.components.EmptyContentView
 import com.example.finalprojectgg.ui.screens.mapdisaster.components.DisasterItem
 import com.example.finalprojectgg.ui.components.FullHeightBottomSheet
 import com.example.finalprojectgg.ui.components.LoadingReportView
 import com.example.finalprojectgg.ui.components.States
 import com.example.finalprojectgg.ui.components.Test2FilterChipGroup
 import com.example.finalprojectgg.ui.components.shimmerEffect
-import com.example.finalprojectgg.ui.screens.main.components.RequestMultiplePermissions
 import com.example.finalprojectgg.ui.screens.main.components.RequestMultiplePermissionsView
 import com.example.finalprojectgg.ui.screens.mapdisaster.map.state.MapScreenEvent
+import com.example.finalprojectgg.ui.screens.mapdisaster.map.state.MapState
+import com.example.finalprojectgg.ui.screens.profile.componentes.InformationDialogView
 import com.example.finalprojectgg.ui.screens.state.FilterEvent
+import com.example.finalprojectgg.ui.screens.state.FilterState
 import com.example.finalprojectgg.ui.viewmodel.MainViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
-import com.google.accompanist.permissions.shouldShowRationale
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalPermissionsApi::class)
 @Composable
@@ -58,9 +59,11 @@ fun MapDisasterScreen(
     paddingValues: PaddingValues,
     viewModel: MainViewModel
 ) {
+    val swipeableState = rememberSwipeableState(initialValue = States.PEEK)
+    val scrollState = rememberLazyListState()
     val mapState by viewModel.mapScreenViewState.collectAsStateWithLifecycle()
     val filterState by viewModel.filterState.collectAsStateWithLifecycle()
-    val permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
+    val permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         listOf(
             Manifest.permission.POST_NOTIFICATIONS,
             Manifest.permission.ACCESS_FINE_LOCATION,
@@ -76,36 +79,62 @@ fun MapDisasterScreen(
     val permissionGranted = multiplePermissionsState.permissions.all {
         it.status == PermissionStatus.Granted
     }
+
+    LaunchedEffect(Unit) {
+        if (!permissionGranted) {
+            multiplePermissionsState.launchMultiplePermissionRequest()
+        }
+    }
+
     RequestMultiplePermissionsView(multiplePermissionsState)
 
+    viewModel.onMapScreenEvent(
+        MapScreenEvent.BottomSheetChanged(
+            scrollState = scrollState,
+            swipeableState = swipeableState
+        )
+    )
+    MapDisasterScreenView(
+        mapState = mapState,
+        filterState = filterState,
+        paddingValues = paddingValues,
+        swipeableState = swipeableState,
+        scrollState = scrollState,
+        onFilterChipClick = {
+            viewModel.onFilterEvent(FilterEvent.OnDisasterChanged(it))
+        }
+    )
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun MapDisasterScreenView(
+    mapState: MapState,
+    filterState: FilterState,
+    paddingValues: PaddingValues,
+    swipeableState: SwipeableState<States>,
+    scrollState: LazyListState,
+    onFilterChipClick: (FilterDisasterModel) -> Unit,
+) {
+    var errorDialogState by remember {
+        mutableStateOf(false)
+    }
+
+    LaunchedEffect(mapState.isError) {
+        errorDialogState = mapState.isError
+
+    }
     Box(
         modifier = Modifier
             .fillMaxSize()
     ) {
-        LaunchedEffect(Unit) {
-            viewModel.onMapScreenEvent(MapScreenEvent.GetReport)
-            if (!permissionGranted){
-                multiplePermissionsState.launchMultiplePermissionRequest()
-            }
-        }
         Box(
             Modifier
                 .fillMaxSize()
                 .padding(top = paddingValues.calculateTopPadding())
         ) {
-            val swipeableState = rememberSwipeableState(initialValue = States.PEEK)
-            val scrollState = rememberLazyListState()
 
-            viewModel.onMapScreenEvent(
-                MapScreenEvent.BottomSheetChanged(
-                    scrollState = scrollState,
-                    swipeableState = swipeableState
-                )
-            )
-
-            MapDisasterFilterChip(filterState.disasterFilter) {
-                viewModel.onFilterEvent(FilterEvent.OnDisasterChanged(it))
-            }
+            MapDisasterFilterChip(filterState.disasterFilter, onFilterChipClick)
 
             FullHeightBottomSheet(
                 swipeableState = swipeableState,
@@ -159,22 +188,48 @@ fun MapDisasterScreen(
                     }
                 }
 
-                if (mapState.isEmpty) {
+                if (mapState.reportModels.isEmpty() && !mapState.isProgress) {
+                    Log.d("report", "Empty")
                     item {
-                        //TODO: Lootie anim empty
+                        EmptyContentView()
                     }
                 }
 
                 items(items = mapState.reportModels, key = { it.id }) { item ->
-                    Box(
-
-                    ) {
+                    Box {
                         DisasterItem(item = item)
                     }
                 }
             }
         }
+
+        ErrorView(
+            errorDesc = mapState.errorMessage,
+            errorDialogState = errorDialogState,
+            onDismiss = {
+                errorDialogState = false
+            }
+        )
     }
+
+}
+
+@Composable
+fun ErrorView(
+    errorDesc: String,
+    errorDialogState: Boolean,
+    onDismiss: () -> Unit
+) {
+    InformationDialogView(
+        title = "Error",
+        icon = {
+            Icon(imageVector = Icons.Filled.ErrorOutline, contentDescription = "Error")
+        },
+        text = errorDesc,
+        informationDialogState = errorDialogState,
+        confirmButton = { },
+        onDismiss = onDismiss
+    )
 }
 
 

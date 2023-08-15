@@ -5,7 +5,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.example.finalprojectgg.ui.screens.state.TimePeriod
 
 data class FilterActive(
-    val filterByDisaster: MutableList<String> = mutableListOf(),
-    val filterByProvince: MutableList<String> = mutableListOf(),
+    var filterByDisaster: MutableList<String> = mutableListOf(),
+    var filterByProvince: MutableList<String> = mutableListOf(),
     var filterByTimePeriod: TimePeriod? = null
 )

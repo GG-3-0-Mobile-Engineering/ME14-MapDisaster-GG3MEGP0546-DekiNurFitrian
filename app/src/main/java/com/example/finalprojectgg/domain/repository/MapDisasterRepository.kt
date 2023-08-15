@@ -9,12 +9,13 @@ import com.example.finalprojectgg.ui.screens.state.FilterState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 
 interface MapDisasterRepository {
     fun getReports(filterQuery:FilterActive): Flow<Resource<List<ReportModel>>>
     fun getReportsArchive(filterQuery: FilterActive):Flow<Resource<List<ReportModel>>>
     fun getFilterActive():SharedFlow<FilterActive>
-    fun getFilter():MutableStateFlow<FilterState>
+    fun getFilter():StateFlow<FilterState>
     fun updateFilterActive(event: FilterEvent)
     fun getProvinceByQuery(query: String): Flow<List<FilterProvinceModel>>
 }

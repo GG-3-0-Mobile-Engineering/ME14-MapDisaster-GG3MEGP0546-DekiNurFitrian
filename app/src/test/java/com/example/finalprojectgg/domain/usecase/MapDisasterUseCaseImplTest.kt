@@ -1,9 +1,11 @@
 package com.example.finalprojectgg.domain.usecase
 
 import com.example.finalprojectgg.data.repository.fake.FakeMapRepository
+import com.example.finalprojectgg.domain.model.FilterActive
 import com.example.finalprojectgg.ui.screens.state.FilterState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -27,6 +29,8 @@ class MapDisasterUseCaseImplTest {
     @Test
     fun `filter active - no active filter when initial`() =
         testScope.runTest {
+            repo.filterActive.tryEmit(FilterActive())
+
             assertEquals(
                 FilterState(),
                 subjectTest.getFilterActive().first()

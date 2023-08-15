@@ -12,6 +12,7 @@ data class MapState(
     override var isContent: Boolean = false,
     override var isEmpty: Boolean = false,
     var isDetail:Boolean = false,
+    var errorMessage:String = "",
     var reportModels: List<ReportModel> = listOf(),
     var properties: MapProperties = MapProperties(
         mapStyleOptions = MapStyleOptions(MapStyle.darkMapStyle),
