@@ -15,6 +15,10 @@ import javax.inject.Singleton
 
 @Singleton
 class RemoteDataSource @Inject constructor(private val apiService: PetaBencanaApiService) {
+
+    /**
+     * Get Report Data from API
+     */
     suspend fun getReports(): Flow<ApiResponse<List<GeometriesItem?>>> {
         return flow {
             try {
@@ -38,6 +42,9 @@ class RemoteDataSource @Inject constructor(private val apiService: PetaBencanaAp
         }.flowOn(Dispatchers.IO)
     }
 
+    /**
+     * Get Report Archive data from API
+     */
     suspend fun getReportsArchive(
         start: String,
         end: String
@@ -65,6 +72,9 @@ class RemoteDataSource @Inject constructor(private val apiService: PetaBencanaAp
         }.flowOn(Dispatchers.IO)
     }
 
+    /**
+     * Get Flood Gauges data from API
+     */
     suspend fun getFloodGauges(
         admin: String,
         format: String,

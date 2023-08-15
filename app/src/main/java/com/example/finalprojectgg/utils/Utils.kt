@@ -16,6 +16,9 @@ import com.google.android.gms.maps.model.LatLng
 class Utils {
     object DataMapper {
 
+        /**
+         * Map Province Model[FilterProvinceModel] to Provide Entity [ProvinceEntity]
+         */
         fun provinceModelToProvinceEntity(data: FilterProvinceModel): ProvinceEntity =
             ProvinceEntity(
                 provinceCode = data.id,
@@ -24,6 +27,9 @@ class Utils {
                 longitude = data.coordinate.longitude
             )
 
+        /**
+         * Map Provide Entity [ProvinceEntity] to Province Model[FilterProvinceModel]
+         */
         fun provinceEntityToProvinceModel(data: ProvinceEntity): FilterProvinceModel =
             FilterProvinceModel(
                 id = data.provinceCode,
@@ -32,6 +38,9 @@ class Utils {
                 isActive = false
             )
 
+        /**
+         * Map Response API [GeometriesItem] to ReportModel[ReportModel]
+         */
         fun reportApiToReportModel(data: GeometriesItem?): ReportModel {
             val properties = data?.properties
             val coordinates = data?.coordinates
@@ -50,6 +59,9 @@ class Utils {
             )
         }
 
+        /**
+         * Map Response API [GeometriesItem] to Report Entity[ReportEntity]
+         */
         fun reportApiToReportEntity(data: GeometriesItem?): ReportEntity {
             val properties = data?.properties
             val coordinates = data?.coordinates
@@ -67,6 +79,9 @@ class Utils {
             )
         }
 
+        /**
+         * Map Report Entity[ReportModel] to Report Model[ReportModel]
+         */
         fun reportEntityToReportModel(data: ReportEntity): ReportModel {
             return ReportModel(
                 id = data.id,
@@ -83,6 +98,9 @@ class Utils {
     }
 
     object Filter {
+        /**
+         * Filtering logic for list of [ReportModel]. This kinda tricky :) but i use only filtering online only data
+         */
         fun recentReport(filterActive: FilterActive, data: List<ReportModel>): List<ReportModel> {
             val filterDisaster = filterActive.filterByDisaster.isNotEmpty()
             val filterProvince = filterActive.filterByProvince.isNotEmpty()
@@ -131,6 +149,9 @@ class Utils {
     }
 
     object Maps {
+        /**
+         * Used to convert resource to a Bitmap
+         */
         fun bitmapDescriptor(
             context: Context,
             vectorResId: Int

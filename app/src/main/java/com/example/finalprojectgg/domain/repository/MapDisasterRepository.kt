@@ -12,10 +12,28 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 
 interface MapDisasterRepository {
+    /**
+     * Get offline first list recent of [ReportModel]. This operation use network resource bounds.
+     */
     fun getReports(filterQuery:FilterActive): Flow<Resource<List<ReportModel>>>
+    /**
+     * Get list of [ReportModel] from network with query time period.
+     */
     fun getReportsArchive(filterQuery: FilterActive):Flow<Resource<List<ReportModel>>>
+    /**
+     * Get filter that has active property in it.
+     */
     fun getFilterActive():SharedFlow<FilterActive>
+    /**
+     * Get filter reference for displaying filter content.
+     */
     fun getFilter():StateFlow<FilterState>
-    fun updateFilterActive(event: FilterEvent)
+    /**
+     * Get list of province by query that given
+     */
     fun getProvinceByQuery(query: String): Flow<List<FilterProvinceModel>>
+    /**
+     * Updating filter active state. This take [FilterEvent] to indicate event triggered by UI.
+     */
+    fun updateFilterActive(event: FilterEvent)
 }
